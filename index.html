@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Galactic Casino</title>
+<style>
+:root{--primary:#4ecca3;--secondary:#e94560;--bg:#0f0f1b;--card:#1a1a2e;--text:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme=violet]{--primary:#b388ff;--secondary:#ff4081;--bg:#120a24;--card:#1e1236}
+:root[data-theme=gold]{--primary:#ffc857;--secondary:#e4572e;--bg:#14110a;--card:#231d10}
+html{height:100%}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);margin:0;display:flex;flex-direction:column;height:100%;overflow:hidden}
+.navbar{background:var(--card);padding:10px;display:flex;justify-content:space-around;align-items:center;flex-shrink:0;gap:8px;flex-wrap:wrap}
+.balance-box{font-size:1.3rem;color:#f8c291;font-weight:bold}
+button{font-family:inherit}
+.btn-menu{background:var(--primary);color:#0f0f1b;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:bold}
+.btn-menu:disabled,.btn-action:disabled{opacity:.4;cursor:not-allowed}
+#msg{min-height:1.4em;text-align:center;font-weight:bold;padding:6px}
+.win{color:var(--primary)}.lose{color:var(--secondary)}
+.page{display:none;width:100%;flex:1;flex-direction:column;align-items:center;overflow-y:auto;animation:f .3s}
+.active-page{display:flex}
+@keyframes f{from{opacity:0}to{opacity:1}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;width:92%;max-width:900px;margin:20px 0}
+.card{background:var(--card);border-radius:15px;padding:22px;text-align:center;border:1px solid #ffffff18;cursor:pointer;transition:.3s}
+.card:hover{border-color:var(--primary);transform:translateY(-4px)}
+.multiplier{font-size:3rem;font-weight:bold;color:var(--primary);margin:6px 0}
+.sub{min-height:1.3em;opacity:.8;font-size:.95rem}
+canvas{max-width:100%}
+.controls{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;background:var(--card);padding:14px 24px;border-radius:12px;margin:10px}
+input,select{background:#ffffff14;border:2px solid var(--primary);color:#fff;padding:10px;border-radius:8px;width:110px;text-align:center;font-size:1.1rem}
+select{width:auto}input[type=range]{width:220px;padding:0}
+input:disabled,select:disabled{opacity:.5}
+.btn-action{width:190px;padding:14px;font-size:1.05rem;font-weight:bold;border:none;border-radius:8px;cursor:pointer}
+.play{background:var(--secondary);color:#fff}
+.cash{background:var(--primary);color:#0f0f1b;display:none}
+.mines-grid{display:grid;grid-template-columns:repeat(4,72px);gap:10px;margin:10px 0}
+.cell{width:72px;height:72px;background:#ffffff18;border:none;border-radius:8px;font-size:2rem;cursor:pointer;color:#fff}
+.cell:hover:not(:disabled){background:#ffffff30}
+.cell.gem{background:var(--primary)}.cell.boom{background:#d00}.cell.ghost{opacity:.5}
+.big{font-size:4rem;margin:10px}
+.item .btn-menu{margin-top:10px;width:100%}
+.item small{opacity:.7;display:block;margin:6px 0}
+</style>
+</head>
+<body>
+<div class="navbar">
+  <button class="btn-menu" id="menu-btn" onclick="navigateTo('lobby')">🏠 MENU</button>
+  <button class="btn-menu" id="shop-btn" onclick="navigateTo('shop-page')">🛒 BOUTIQUE</button>
+  <div class="balance-box" id="global-balance"></div>
+  <button class="btn-menu" id="reload-btn" onclick="Bank.set(1000)" title="Disponible si solde &lt; 10">↺ Recharger</button>
+</div>
+<div id="msg"></div>
+
+<div id="lobby" class="page active-page">
+  <h1 style="text-align:center">GALACTIC CASINO</h1>
+  <div class="grid">
+    <div class="card" onclick="navigateTo('crash-page')"><h2>🚀 CRASH</h2><p>Encaisse avant le crash</p></div>
+    <div class="card" onclick="navigateTo('mines-page')"><h2>💣 MINES</h2><p>Grille de 16 cases</p></div>
+    <div class="card" onclick="navigateTo('canyon-page')"><h2>🛸 CANYON</h2><p>Flèches ← →</p></div>
+    <div class="card" onclick="navigateTo('coin-page')"><h2>🪙 PILE/FACE</h2><p>Quitte ou double</p></div>
+    <div class="card" onclick="navigateTo('dice-page')"><h2>🎲 DÉS</h2><p>Choisis ta cote</p></div>
+  </div>
+  <button class="btn-menu" style="opacity:.6;margin-bottom:20px" onclick="navigateTo('admin-page')">🔐 Admin</button>
+</div>
+
+<div id="crash-page" class="page">
+  <div class="multiplier" id="crash-mult">1.00x</div>
+  <div class="sub" id="crash-sub"></div>
+  <canvas id="crash-canvas" width="800" height="320"></canvas>
+  <div class="controls">
+    <input type="number" id="crash-bet" value="10" min="1" step="1">
+    <button id="crash-start" class="btn-action play" onclick="Crash.start()">PARIER</button>
+    <button id="crash-cash" class="btn-action cash" onclick="Crash.cash()">CASH OUT</button>
+  </div>
+</div>
+
+<div id="mines-page" class="page">
+  <div class="multiplier" id="mines-mult">1.00x</div>
+  <div id="mines-grid" class="mines-grid"></div>
+  <div class="controls">
+    <input type="number" id="mines-bet" value="10" min="1" step="1">
+    <label>Mines <select id="mines-count"></select></label>
+    <button id="mines-start" class="btn-action play" onclick="Mines.start()">LANCER</button>
+    <button id="mines-cash" class="btn-action cash" onclick="Mines.cash()">ENCAISSER</button>
+  </div>
+</div>
+
+<div id="canyon-page" class="page">
+  <div class="multiplier" id="canyon-mult">1.00x</div>
+  <canvas id="canyon-canvas" width="600" height="500" style="background:#000;border-radius:15px;border:3px solid #ffffff20"></canvas>
+  <div class="controls">
+    <input type="number" id="canyon-bet" value="10" min="1" step="1">
+    <button id="canyon-start" class="btn-action play" onclick="Canyon.start()">VOLER</button>
+    <button id="canyon-cash" class="btn-action cash" onclick="Canyon.cash()">ÉJECTION</button>
+  </div>
+</div>
+
+<div id="coin-page" class="page">
+  <div class="multiplier">x1.94</div>
+  <div class="big" id="coin-face">🪙</div>
+  <div class="controls">
+    <input type="number" id="coin-bet" value="10" min="1" step="1">
+    <button class="btn-action play" onclick="Coin.play('PILE')">PILE</button>
+    <button class="btn-action play" onclick="Coin.play('FACE')">FACE</button>
+  </div>
+</div>
+
+<div id="dice-page" class="page">
+  <div class="multiplier" id="dice-mult"></div>
+  <div class="big" id="dice-res">🎲</div>
+  <div class="controls">
+    <input type="number" id="dice-bet" value="10" min="1" step="1">
+    <label>Sous <b id="dice-x">50</b> <input type="range" id="dice-slider" min="2" max="95" value="50" oninput="Dice.upd()"></label>
+    <button class="btn-action play" onclick="Dice.play()">LANCER</button>
+  </div>
+</div>
+
+<div id="shop-page" class="page">
+  <h2>🛒 Boutique</h2>
+  <div class="grid" id="shop-grid"></div>
+</div>
+
+<div id="admin-page" class="page">
+  <h2>🔐 Administration</h2>
+  <div id="admin-lock" class="controls">
+    <input type="password" id="admin-code" placeholder="Code d'accès" style="width:200px" onkeydown="if(event.key==='Enter')Admin.login()">
+    <button class="btn-action play" onclick="Admin.login()">ENTRER</button>
+  </div>
+  <div id="admin-panel" style="display:none;width:92%;max-width:700px">
+    <div class="controls">
+      <input type="number" id="admin-amt" value="1000" min="0" step="100">
+      <button class="btn-menu" onclick="Admin.add(1)">+ Ajouter</button>
+      <button class="btn-menu" onclick="Admin.add(-1)">− Retirer</button>
+      <button class="btn-menu" onclick="Admin.setBal()">Définir le solde</button>
+    </div>
+    <div class="controls">
+      <button class="btn-menu" onclick="Admin.unlockAll()">🎁 Débloquer toute la boutique</button>
+      <button class="btn-menu" onclick="Admin.resetShop()">🧹 Réinitialiser les achats</button>
+    </div>
+    <div class="controls">
+      <button class="btn-menu" onclick="Admin.logout()">🔒 Verrouiller</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const HOUSE=0.97;
+const col=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+/* ---------- Boutique ---------- */
+const ITEMS=[
+ {id:'th-base',t:'theme',n:'🌑 Classique',d:'Thème de départ',p:0,v:'base'},
+ {id:'th-violet',t:'theme',n:'🌌 Nébuleuse',d:'Thème violet',p:300,v:'violet'},
+ {id:'th-gold',t:'theme',n:'✨ Or massif',d:'Thème doré',p:800,v:'gold'},
+ {id:'b-none',t:'badge',n:'⚪ Aucun badge',d:'Pas de badge',p:0,v:''},
+ {id:'b-rocket',t:'badge',n:'🚀 Fusée',d:'Badge devant ton solde',p:150,v:'🚀'},
+ {id:'b-crown',t:'badge',n:'👑 Couronne',d:'Badge devant ton solde',p:500,v:'👑'},
+ {id:'b-dragon',t:'badge',n:'🐉 Dragon',d:'Badge devant ton solde',p:1000,v:'🐉'},
+ {id:'boost',t:'boost',n:'💎 Boost VIP',d:'+5 % sur tous tes gains, pour toujours',p:1500}
+];
+const Shop={own:['th-base','b-none'],theme:'base',badge:'',
+ load(){try{const s=JSON.parse(localStorage.getItem('gc_shop'));if(s&&Array.isArray(s.own))Object.assign(this,s)}catch(e){}this.apply()},
+ save(){try{localStorage.setItem('gc_shop',JSON.stringify({own:this.own,theme:this.theme,badge:this.badge}))}catch(e){}},
+ apply(){document.documentElement.dataset.theme=this.theme;Bank.render()},
+ boost(){return this.own.includes('boost')?1.05:1},
+ render(){
+  $('#shop-grid').innerHTML=ITEMS.map(i=>{
+   const has=this.own.includes(i.id),on=(i.t==='theme'&&this.theme===i.v)||(i.t==='badge'&&this.badge===i.v);
+   const lbl=!has?`Acheter ${i.p} ¤`:i.t==='boost'?'Possédé ✓':on?'Équipé ✓':'Équiper';
+   return `<div class="card item"><h3>${i.n}</h3><small>${i.d}</small><button class="btn-menu" ${(has&&(on||i.t==='boost'))?'disabled':''} onclick="Shop.act('${i.id}')">${lbl}</button></div>`}).join('');
+ },
+ act(id){
+  const i=ITEMS.find(x=>x.id===id);
+  if(!this.own.includes(id)){
+   if(!Bank.take(i.p))return toast('Solde insuffisant','lose');
+   this.own.push(id);toast(`Acheté : ${i.n}`,'win');
+  }
+  if(i.t==='theme')this.theme=i.v;
+  if(i.t==='badge')this.badge=i.v;
+  this.save();this.apply();this.render();
+ }
+};
+
+/* ---------- Banque unique (persistée + synchronisée entre onglets) ---------- */
+const Bank={bal:1000,
+ load(){try{const v=localStorage.getItem('gc_bal');if(v!==null&&!isNaN(v))this.bal=+v}catch(e){}this.render()},
+ save(){try{localStorage.setItem('gc_bal',String(this.bal))}catch(e){}},
+ render(){
+  $('#global-balance').textContent=`${Shop.badge} 💰 ${this.bal.toFixed(2)} ¤`.trim();
+  $('#reload-btn').disabled=this.bal>=10||!!current;
+ },
+ set(v){this.bal=Math.max(0,Math.round(v*100)/100);this.save();this.render()},
+ take(b){if(!(b>0)||b>this.bal)return false;this.set(this.bal-b);return true},
+ pay(a){const p=Math.round(a*Shop.boost()*100)/100;this.set(this.bal+p);return p}
+};
+window.addEventListener('storage',e=>{
+ if(e.key==='gc_bal'&&e.newValue!==null){Bank.bal=+e.newValue;Bank.render()}
+ if(e.key==='gc_shop'){Shop.load();Shop.render()}
+});
+
+/* ---------- Gestion d'une seule manche à la fois ---------- */
+let current=null;
+function toast(t,cls=''){const m=$('#msg');m.textContent=t;m.className=cls}
+function getBet(g){
+ const b=Math.round(parseFloat($(`#${g}-bet`).value)*100)/100;
+ if(!(b>0)){toast('Mise invalide','lose');return 0}
+ if(b>Bank.bal){toast('Solde insuffisant','lose');return 0}
+ return b;
+}
+function setRunning(g,on){
+ current=on?g:null;
+ const s=$(`#${g}-start`),c=$(`#${g}-cash`),mc=$('#mines-count');
+ if(s)s.style.display=on?'none':'block';
+ if(c)c.style.display=on?'block':'none';
+ $(`#${g}-bet`).disabled=on;
+ if(g==='mines')mc.disabled=on;
+ $('#menu-btn').disabled=$('#shop-btn').disabled=on;Bank.render();
+}
+function navigateTo(id){
+ if(current)return;
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active-page'));
+ $('#'+id).classList.add('active-page');toast('');
+ if(id==='crash-page')Crash.reset();
+ if(id==='mines-page')Mines.build(false);
+ if(id==='shop-page')Shop.render();
+ if(id==='admin-page')Admin.show();
+ if(id==='dice-page')Dice.upd();
+}
+
+/* ---------- CRASH : courbe et chiffre lus depuis la même source (pts) ---------- */
+const cCanvas=$('#crash-canvas'),cCtx=cCanvas.getContext('2d');
+const Crash={raf:0,t0:0,cp:1,bet:0,pts:[],cashed:0,cashPt:null,
+ render(){
+  const L=this.pts[this.pts.length-1]||{s:0,m:1};
+  const xmax=Math.max(8,L.s*1.1),ymax=Math.max(3,L.m*1.15);
+  const X=s=>55+s/xmax*735,Y=m=>300-Math.log(m)/Math.log(ymax)*285;
+  cCtx.clearRect(0,0,800,320);cCtx.font='bold 13px Arial';cCtx.textAlign='right';
+  [1.5,2,3,5,10,20,50,100].filter(v=>v<ymax).concat([1]).forEach(v=>{
+   cCtx.fillStyle='rgba(255,255,255,.1)';cCtx.fillRect(55,Y(v),745,1);
+   cCtx.fillStyle='rgba(255,255,255,.45)';cCtx.fillText(v+'x',45,Y(v)+5)});
+  cCtx.strokeStyle='rgba(255,255,255,.25)';cCtx.lineWidth=2;
+  cCtx.beginPath();cCtx.moveTo(55,10);cCtx.lineTo(55,300);cCtx.lineTo(800,300);cCtx.stroke();
+  const line=(from,to,color)=>{
+   cCtx.strokeStyle=color;cCtx.lineWidth=4;cCtx.beginPath();
+   for(let i=from;i<=to&&i<this.pts.length;i++){const p=this.pts[i];i===from?cCtx.moveTo(X(p.s),Y(p.m)):cCtx.lineTo(X(p.s),Y(p.m))}
+   cCtx.stroke()};
+  const ci=this.cashPt,end=this.pts.length-1;
+  if(ci===null)line(0,end,L.crashed?col('--secondary'):col('--primary'));
+  else{
+   line(0,ci,col('--primary'));
+   if(end>ci)line(ci,end,'rgba(255,255,255,.3)');
+   const p=this.pts[ci];cCtx.fillStyle='#fff';cCtx.beginPath();cCtx.arc(X(p.s),Y(p.m),7,0,7);cCtx.fill();
+  }
+ },
+ reset(){this.pts=[];this.cashPt=null;this.render();this.num('1.00x',col('--primary'));$('#crash-sub').textContent=''},
+ num(t,c){const e=$('#crash-mult');e.textContent=t;e.style.color=c},
+ start(){
+  if(current)return;const b=getBet('crash');if(!b||!Bank.take(b))return;
+  cancelAnimationFrame(this.raf);
+  this.bet=b;this.cashed=0;this.cashPt=null;this.pts=[];
+  const r=Math.random();this.cp=Math.min(100,Math.max(1,Math.floor(HOUSE*100/(1-r))/100));
+  toast('');$('#crash-sub').textContent='';setRunning('crash',true);
+  this.t0=performance.now();this.raf=requestAnimationFrame(t=>this.tick(t));
+ },
+ tick(now){
+  const s=(now-this.t0)/1000;let m=Math.exp(0.1*s);const crashed=m>=this.cp;if(crashed)m=this.cp;
+  this.pts.push({s,m,crashed});this.render();
+  if(this.cashed){$('#crash-sub').textContent=`Encaissé à ${this.cashed.toFixed(2)}x · la courbe continue : ${m.toFixed(2)}x`}
+  else this.num((crashed?'💥 ':'')+m.toFixed(2)+'x',crashed?col('--secondary'):col('--primary'));
+  if(crashed){
+   this.raf=0;
+   if(this.cashed)$('#crash-sub').textContent=`Encaissé à ${this.cashed.toFixed(2)}x · ça a crashé à ${m.toFixed(2)}x`;
+   else{setRunning('crash',false);toast(`Crash à ${m.toFixed(2)}x : -${this.bet.toFixed(2)} ¤`,'lose')}
+  }else this.raf=requestAnimationFrame(t=>this.tick(t));
+ },
+ cash(){
+  if(current!=='crash'||!this.pts.length)return;
+  const i=this.pts.length-1,m=this.pts[i].m;
+  this.cashed=m;this.cashPt=i;
+  const p=Bank.pay(this.bet*m);setRunning('crash',false);
+  this.num('✅ '+m.toFixed(2)+'x','#fff');this.render();
+  toast(`Encaissé à ${m.toFixed(2)}x : +${(p-this.bet).toFixed(2)} ¤`,'win');
+ }
+};
+
+/* ---------- MINES ---------- */
+const Mines={mines:[],picked:0,bet:0,on:false,n:4,
+ multAt(k){let x=HOUSE;for(let i=0;i<k;i++)x*=(16-i)/(16-this.n-i);return x},
+ build(active){
+  const g=$('#mines-grid');g.innerHTML='';
+  for(let i=0;i<16;i++){const c=document.createElement('button');c.className='cell';c.disabled=!active;if(active)c.onclick=()=>this.pick(i);g.appendChild(c)}
+  $('#mines-mult').textContent='1.00x';
+ },
+ start(){
+  if(current)return;const b=getBet('mines');if(!b||!Bank.take(b))return;
+  this.bet=b;this.n=+$('#mines-count').value;this.picked=0;this.on=true;
+  const a=Array.from({length:16},(_,i)=>i);
+  for(let i=15;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+  this.mines=a.slice(0,this.n);this.build(true);toast('');setRunning('mines',true);this.refresh();
+ },
+ refresh(){
+  $('#mines-mult').textContent=this.multAt(this.picked).toFixed(2)+'x';
+  const cb=$('#mines-cash');cb.disabled=this.picked===0;
+  cb.textContent=this.picked?`ENCAISSER ${(this.bet*this.multAt(this.picked)).toFixed(2)}`:'ENCAISSER';
+ },
+ pick(i){
+  if(!this.on)return;const cells=document.querySelectorAll('.cell'),c=cells[i];
+  if(c.disabled)return;c.disabled=true;
+  if(this.mines.includes(i)){
+   this.on=false;c.textContent='💥';c.classList.add('boom');
+   this.mines.forEach(m=>{if(m!==i){cells[m].textContent='💣';cells[m].classList.add('ghost')}});
+   cells.forEach(x=>x.disabled=true);setRunning('mines',false);toast(`Boom ! -${this.bet.toFixed(2)} ¤`,'lose');
+  }else{c.textContent='💎';c.classList.add('gem');this.picked++;this.refresh();if(this.picked===16-this.n)this.cash()}
+ },
+ cash(){
+  if(!this.on||this.picked<1)return;this.on=false;
+  const p=Bank.pay(this.bet*this.multAt(this.picked));
+  const cells=document.querySelectorAll('.cell');
+  this.mines.forEach(m=>{if(!cells[m].textContent){cells[m].textContent='💣';cells[m].classList.add('ghost')}});
+  cells.forEach(x=>x.disabled=true);setRunning('mines',false);toast(`Encaissé : +${(p-this.bet).toFixed(2)} ¤`,'win');
+ }
+};
+for(let i=1;i<=10;i++){const o=document.createElement('option');o.value=i;o.textContent=i;if(i===4)o.selected=true;$('#mines-count').appendChild(o)}
+
+/* ---------- CANYON ---------- */
+const keys={};
+addEventListener('keydown',e=>{keys[e.code]=true;if(current==='canyon'&&e.code.startsWith('Arrow'))e.preventDefault()});
+addEventListener('keyup',e=>keys[e.code]=false);
+const ctx=$('#canyon-canvas').getContext('2d');
+const Canyon={raf:0,last:0,score:1,x:300,obs:[],bet:0,
+ start(){
+  if(current)return;const b=getBet('canyon');if(!b||!Bank.take(b))return;
+  this.bet=b;this.score=1;this.x=300;this.obs=[];toast('');setRunning('canyon',true);
+  this.last=performance.now();this.raf=requestAnimationFrame(t=>this.tick(t));
+ },
+ tick(now){
+  const dt=Math.min((now-this.last)/1000,.05);this.last=now;this.score+=0.3*dt;
+  if(keys.ArrowLeft&&this.x>25)this.x-=480*dt;
+  if(keys.ArrowRight&&this.x<575)this.x+=480*dt;
+  if(Math.random()<4.8*dt)this.obs.push({x:Math.random()*540,y:-30});
+  const v=300+60*this.score;let hit=false;ctx.clearRect(0,0,600,500);
+  this.obs.forEach(o=>{o.y+=v*dt;ctx.fillStyle='#888';ctx.fillRect(o.x,o.y,60,30);
+   if(o.y+30>440&&o.y<480&&this.x+16>o.x&&this.x-16<o.x+60)hit=true});
+  this.obs=this.obs.filter(o=>o.y<500);
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(this.x,440);ctx.lineTo(this.x-20,480);ctx.lineTo(this.x+20,480);ctx.fill();
+  $('#canyon-mult').textContent=this.score.toFixed(2)+'x';
+  if(hit){this.raf=0;setRunning('canyon',false);toast(`Collision : -${this.bet.toFixed(2)} ¤`,'lose');return}
+  this.raf=requestAnimationFrame(t=>this.tick(t));
+ },
+ cash(){
+  if(!this.raf)return;cancelAnimationFrame(this.raf);this.raf=0;
+  const p=Bank.pay(this.bet*this.score);setRunning('canyon',false);
+  toast(`Éjection à ${this.score.toFixed(2)}x : +${(p-this.bet).toFixed(2)} ¤`,'win');
+ }
+};
+
+/* ---------- PILE OU FACE ---------- */
+const Coin={play(side){
+ if(current)return;const b=getBet('coin');if(!b||!Bank.take(b))return;
+ current='coin';$('#menu-btn').disabled=true;Bank.render();toast('');
+ const f=$('#coin-face');f.textContent='🌀';
+ setTimeout(()=>{
+  const r=Math.random()<.5?'PILE':'FACE';f.textContent=r==='PILE'?'🟡 PILE':'⚪ FACE';
+  if(r===side){const p=Bank.pay(b*2*HOUSE);toast(`Gagné ! +${(p-b).toFixed(2)} ¤`,'win')}
+  else toast(`Perdu : -${b.toFixed(2)} ¤`,'lose');
+  current=null;$('#menu-btn').disabled=false;Bank.render();
+ },700);
+}};
+
+/* ---------- DÉS ---------- */
+const Dice={
+ upd(){const x=+$('#dice-slider').value;$('#dice-x').textContent=x;
+  $('#dice-mult').textContent=`x${(HOUSE*100/(x-1)).toFixed(2)} · ${x-1} % de chance`},
+ play(){
+  if(current)return;const b=getBet('dice');if(!b||!Bank.take(b))return;
+  const x=+$('#dice-slider').value,roll=1+Math.floor(Math.random()*100);
+  $('#dice-res').textContent=roll;
+  if(roll<x){const p=Bank.pay(b*HOUSE*100/(x-1));toast(`${roll} < ${x} : +${(p-b).toFixed(2)} ¤`,'win')}
+  else toast(`${roll} ≥ ${x} : -${b.toFixed(2)} ¤`,'lose');
+ }
+};
+
+/* ---------- ADMIN (code vérifié via hash SHA-256, session en mémoire) ---------- */
+const Admin={ok:false,fails:0,until:0,
+ HASH:'038c5f2a0042acfe23afc6c498b428c115ee620bb5a16daf22946aef79d3b0f7',
+ async sha(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')},
+ show(){$('#admin-lock').style.display=this.ok?'none':'flex';$('#admin-panel').style.display=this.ok?'block':'none';$('#admin-code').value=''},
+ async login(){
+  const now=Date.now();if(now<this.until)return toast(`Trop d'essais, attends ${Math.ceil((this.until-now)/1000)} s`,'lose');
+  let h='';try{h=await this.sha($('#admin-code').value.trim())}catch(e){return toast('Vérification indisponible','lose')}
+  if(h===this.HASH){this.ok=true;this.fails=0;toast('Accès admin accordé','win');this.show()}
+  else{this.fails++;$('#admin-code').value='';if(this.fails>=3){this.until=now+30000;this.fails=0;toast('Code incorrect : verrouillé 30 s','lose')}else toast('Code incorrect','lose')}
+ },
+ logout(){this.ok=false;this.show();toast('Admin verrouillé')},
+ amt(){const v=parseFloat($('#admin-amt').value);return v>=0?v:0},
+ add(sign){if(!this.ok)return;Bank.set(Bank.bal+sign*this.amt());toast('Solde mis à jour','win')},
+ setBal(){if(!this.ok)return;Bank.set(this.amt());toast('Solde défini','win')},
+ unlockAll(){if(!this.ok)return;Shop.own=ITEMS.map(i=>i.id);Shop.save();Shop.apply();toast('Boutique débloquée','win')},
+ resetShop(){if(!this.ok)return;Shop.own=['th-base','b-none'];Shop.theme='base';Shop.badge='';Shop.save();Shop.apply();toast('Achats réinitialisés','win')}
+};
+
+Shop.load();Bank.load();Crash.reset();Mines.build(false);Dice.upd();
+</script>
+</body>
+</html>
