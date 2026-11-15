@@ -1,6 +1,6 @@
 # 🎰 Galactic Casino
 
-Petit casino en un seul fichier HTML, jouable dans le navigateur, avec des **crédits virtuels (¤)**. Aucun argent réel n'est en jeu.
+Petit casino en un seul fichier HTML, jouable dans le navigateur, avec des **crédits virtuels**. Aucun argent réel n'est en jeu.
 
 ## Jeux
 - 🚀 **Crash** : encaisse avant le crash, la courbe et le multiplicateur sont synchronisés
