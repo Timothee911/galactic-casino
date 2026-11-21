@@ -10,7 +10,13 @@ Petit casino en un seul fichier HTML, jouable dans le navigateur, avec des **cr�
 - 🎲 **Dés** : choisis ton seuil et ta cote
 
 ## Boutique
-Thèmes, badges et Boost VIP (+5 % de gains), achetables avec tes gains.
+Thèmes, badges, vaisseaux pour Canyon et Boost VIP (+5 % de gains), achetables avec tes gains.
+
+## Et aussi
+- **Encaissement automatique** au Crash : choisis un multiplicateur et la manche encaisse toute seule
+- **Bonus quotidien** de 100 crédits, toutes les 20 heures
+- **Statistiques** : manches jouées, taux de victoire, meilleur gain, bilan net et 15 dernières manches
+- **Sons** générés dans le navigateur (aucun fichier), désactivables depuis l'en-tête
 
 ## Admin
 Une page admin protégée par un code permet d'ajuster le solde et la boutique. Le code est vérifié côté navigateur (hash SHA-256) : c'est pratique pour un jeu local, pas une vraie sécurité.

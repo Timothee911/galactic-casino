@@ -131,7 +131,7 @@ select option{background:var(--void2)}
 .item{display:flex;align-items:center;gap:14px;padding:14px 4px;border-bottom:1px solid var(--line)}
 .sw{display:flex;flex-shrink:0;width:64px;height:40px;border-radius:12px;overflow:hidden;border:1px solid var(--line);align-items:center;justify-content:center;font-size:1.3rem;background:var(--void2)}
 .sw i{flex:1;height:100%}
-.sw.big{font-family:var(--f-d);font-size:1rem;font-weight:700}
+.sw.txt{font-family:var(--f-d);font-size:1rem;font-weight:700;color:var(--ivory)}
 .info{flex:1;min-width:0;display:flex;flex-direction:column}
 .info span{color:var(--mute);font-size:.9rem}
 .price{font-family:var(--f-d);font-size:.9rem;font-variant-numeric:tabular-nums}
@@ -147,6 +147,20 @@ select option{background:var(--void2)}
   .game.active-page{grid-template-columns:1fr}
   .stage{min-height:0;padding:16px}
 }
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0 4px}
+.kpi{background:var(--void2);border:1px solid var(--line);border-radius:18px;padding:16px}
+.kpi b{display:block;font:500 1.25rem var(--f-d);font-variant-numeric:tabular-nums}
+.kpi span{color:var(--mute);font-size:.9rem}
+.daily{margin-top:18px}
+.daily .mini{padding:11px 20px;font-size:.95rem}
+#daily-btn:disabled{opacity:1;background:var(--void2);color:var(--mute);border:1px solid var(--line)}
+@media (max-width:600px){
+  .top{gap:6px 12px;padding:10px 14px}
+  .top .brand{order:1;font-size:.9rem}
+  .top .wallet{order:2;padding:4px 5px 4px 12px}
+  .top nav{order:3;width:100%;display:flex;justify-content:space-between}
+  .navlink{padding:7px 10px;font-size:.88rem}
+}
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
@@ -157,8 +171,10 @@ select option{background:var(--void2)}
 <header class="top">
   <span class="brand">Galactic Casino</span>
   <nav>
-    <button class="navlink on" id="menu-btn" onclick="navigateTo('lobby')">Lobby</button>
-    <button class="navlink" id="shop-btn" onclick="navigateTo('shop-page')">Boutique</button>
+    <button class="navlink on" id="menu-btn" data-nav="lobby" onclick="navigateTo('lobby')">Lobby</button>
+    <button class="navlink" id="shop-btn" data-nav="shop-page" onclick="navigateTo('shop-page')">Boutique</button>
+    <button class="navlink" id="stats-btn" data-nav="stats-page" onclick="navigateTo('stats-page')">Stats</button>
+    <button class="navlink" id="snd-btn" aria-pressed="true" onclick="Snd.toggle()">Son activé</button>
   </nav>
   <div class="wallet">
     <span id="global-balance" aria-live="polite"></span>
@@ -172,6 +188,7 @@ select option{background:var(--void2)}
   <div class="hero">
     <h1>Pose ta mise</h1>
     <p>Cinq jeux, des crédits virtuels : rien ne se joue pour de vrai.</p>
+    <div class="daily"><button class="mini" id="daily-btn" onclick="Daily.claim()"></button></div>
   </div>
   <div class="tiles">
     <button class="tile wide" style="--c:#c8323a;--i:0" onclick="navigateTo('crash-page')">
@@ -229,6 +246,9 @@ select option{background:var(--void2)}
     <p class="rule">Le multiplicateur monte jusqu'au crash. Encaisse avant pour garder tes gains.</p>
     <label class="field">Mise
       <div class="bet"><input type="number" id="crash-bet" value="10" min="1" step="1"><button class="qb" onclick="Bet.mul('crash',.5)">½</button><button class="qb" onclick="Bet.mul('crash',2)">×2</button></div>
+    </label>
+    <label class="field">Encaissement auto à (x), facultatif
+      <input type="number" id="crash-auto" placeholder="ex. 2.00" min="1.01" step="0.01">
     </label>
     <button id="crash-start" class="btn play" onclick="Crash.start()">Parier</button>
     <button id="crash-cash" class="btn cash" onclick="Crash.cash()">Encaisser</button>
@@ -317,6 +337,17 @@ select option{background:var(--void2)}
   </div>
 </section>
 
+<!-- Statistiques -->
+<section id="stats-page" class="page">
+  <div class="shop">
+    <h2>Statistiques</h2>
+    <p class="lead">Tes résultats depuis ta première manche.</p>
+    <div class="kpis" id="stats-kpis"></div>
+    <h3 class="grp">Dernières manches</h3>
+    <ul class="list" id="stats-hist"></ul>
+  </div>
+</section>
+
 <!-- Administration -->
 <section id="admin-page" class="page">
   <div class="admin">
@@ -338,6 +369,7 @@ select option{background:var(--void2)}
         <div class="row3">
           <button class="btn ghost" onclick="Admin.unlockAll()">Débloquer la boutique</button>
           <button class="btn ghost" onclick="Admin.resetShop()">Réinitialiser les achats</button>
+          <button class="btn ghost" onclick="Admin.resetStats()">Effacer les stats</button>
         </div>
       </div>
       <button class="btn play" onclick="Admin.logout()">Verrouiller</button>
@@ -351,6 +383,15 @@ const HOUSE=0.97;
 const CR='<i class="cr" role="img" aria-label="crédits"></i>';
 const col=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 
+/* ---------- Vaisseaux (Canyon) ---------- */
+const SHIPS={
+ base:{c:null,d:'M0-20 20 20 0 13-20 20Z'},
+ comet:{c:'#5fe3ff',d:'M0-24 9 6 22 22 0 14-22 22-9 6Z'},
+ phoenix:{c:'#ff7a45',d:'M0-23 6-8 26 12 25 20 8 12 0 20-8 12-25 20-26 12-6-8Z'}
+};
+Object.values(SHIPS).forEach(v=>v.p=new Path2D(v.d));
+const shipIcon=k=>`<svg viewBox="-26 -26 52 52" width="30" height="30" aria-hidden="true"><path d="${SHIPS[k].d}" fill="${SHIPS[k].c||'#f2b84b'}"/></svg>`;
+
 /* ---------- Boutique ---------- */
 const ITEMS=[
  {id:'th-base',t:'theme',n:'Classique',d:'Feutre vert et laiton',p:0,v:'base',sw:['#0c1127','#12514a','#f2b84b']},
@@ -360,19 +401,22 @@ const ITEMS=[
  {id:'b-rocket',t:'badge',n:'Fusée',d:'Affichée devant ton solde',p:150,v:'🚀',ic:'🚀'},
  {id:'b-crown',t:'badge',n:'Couronne',d:'Affichée devant ton solde',p:500,v:'👑',ic:'👑'},
  {id:'b-dragon',t:'badge',n:'Dragon',d:'Affiché devant ton solde',p:1000,v:'🐉',ic:'🐉'},
+ {id:'sh-base',t:'ship',n:'Éclaireur',d:'Le vaisseau de départ',p:0,v:'base',ic:shipIcon('base')},
+ {id:'sh-comet',t:'ship',n:'Comète',d:'Aile fine, traînée bleue glacier',p:250,v:'comet',ic:shipIcon('comet')},
+ {id:'sh-phoenix',t:'ship',n:'Phénix',d:'Grandes ailes orange feu',p:600,v:'phoenix',ic:shipIcon('phoenix')},
  {id:'boost',t:'boost',n:'Boost VIP',d:'+5 % sur tous tes gains, pour toujours',p:1500,ic:'+5 %'}
 ];
-const Shop={own:['th-base','b-none'],theme:'base',badge:'',
- load(){try{const s=JSON.parse(localStorage.getItem('gc_shop'));if(s&&Array.isArray(s.own))Object.assign(this,s)}catch(e){}this.apply()},
- save(){try{localStorage.setItem('gc_shop',JSON.stringify({own:this.own,theme:this.theme,badge:this.badge}))}catch(e){}},
+const Shop={own:['th-base','b-none','sh-base'],theme:'base',badge:'',ship:'base',
+ load(){try{const s=JSON.parse(localStorage.getItem('gc_shop'));if(s&&Array.isArray(s.own)){Object.assign(this,s);if(!this.own.includes('sh-base'))this.own.push('sh-base')}}catch(e){}this.apply()},
+ save(){try{localStorage.setItem('gc_shop',JSON.stringify({own:this.own,theme:this.theme,badge:this.badge,ship:this.ship}))}catch(e){}},
  apply(){document.documentElement.dataset.theme=this.theme;Bank.render()},
  boost(){return this.own.includes('boost')?1.05:1},
  render(){
-  const groups=[['theme','Thèmes'],['badge','Badges'],['boost','Avantage']];
+  const groups=[['theme','Thèmes'],['badge','Badges'],['ship','Vaisseaux pour Canyon'],['boost','Avantage']];
   $('#shop-grid').innerHTML=groups.map(([t,title])=>`<h3 class="grp">${title}</h3><ul class="list">`+
    ITEMS.filter(i=>i.t===t).map(i=>{
-    const has=this.own.includes(i.id),on=(i.t==='theme'&&this.theme===i.v)||(i.t==='badge'&&this.badge===i.v);
-    const sw=i.sw?`<span class="sw">${i.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span>`:`<span class="sw big">${i.ic}</span>`;
+    const has=this.own.includes(i.id),on=(i.t==='theme'&&this.theme===i.v)||(i.t==='badge'&&this.badge===i.v)||(i.t==='ship'&&this.ship===i.v);
+    const sw=i.sw?`<span class="sw">${i.sw.map(c=>`<i style="background:${c}"></i>`).join('')}</span>`:`<span class="sw txt">${i.ic}</span>`;
     const lbl=!has?'Acheter':i.t==='boost'?'Possédé':on?'Équipé':'Équiper';
     const dis=has&&(on||i.t==='boost');
     const price=has?'':`<span class="price">${i.p}${CR}</span>`;
@@ -386,6 +430,7 @@ const Shop={own:['th-base','b-none'],theme:'base',badge:'',
   }
   if(i.t==='theme')this.theme=i.v;
   if(i.t==='badge')this.badge=i.v;
+  if(i.t==='ship')this.ship=i.v;
   this.save();this.apply();this.render();
  }
 };
@@ -405,7 +450,71 @@ const Bank={bal:1000,
 window.addEventListener('storage',e=>{
  if(e.key==='gc_bal'&&e.newValue!==null){Bank.bal=+e.newValue;Bank.render()}
  if(e.key==='gc_shop'){Shop.load();Shop.render()}
+ if(e.key==='gc_stats'){Stats.load();if($('#stats-page').classList.contains('active-page'))Stats.render()}
 });
+
+/* ---------- Sons (Web Audio, aucun fichier) ---------- */
+const Snd={on:true,ctx:null,
+ load(){try{this.on=localStorage.getItem('gc_snd')!=='0'}catch(e){}this.ui()},
+ ui(){const b=$('#snd-btn');b.textContent=this.on?'Son activé':'Son coupé';b.setAttribute('aria-pressed',String(this.on))},
+ unlock(){try{const C=this.ctx||(this.ctx=new(window.AudioContext||window.webkitAudioContext)());if(C.state==='suspended')C.resume()}catch(e){}},
+ toggle(){this.on=!this.on;try{localStorage.setItem('gc_snd',this.on?'1':'0')}catch(e){}this.ui();this.unlock();if(this.on)this.tone(660,.1)},
+ tone(f,d=.12,type='sine',vol=.07,at=0){
+  if(!this.on||!this.ctx)return;
+  try{
+   const C=this.ctx,o=C.createOscillator(),g=C.createGain(),t=C.currentTime+at;
+   o.type=type;o.frequency.setValueAtTime(f,t);
+   g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+   o.connect(g);g.connect(C.destination);o.start(t);o.stop(t+d+.02);
+  }catch(e){}
+ },
+ win(){[523,659,784,1047].forEach((f,i)=>this.tone(f,.16,'triangle',.08,i*.09))},
+ lose(){this.tone(220,.25,'sawtooth',.05);this.tone(165,.35,'sawtooth',.05,.15)},
+ tick(n=0){this.tone(520+n*45,.07,'square',.04)},
+ flip(){for(let i=0;i<5;i++)this.tone(900-i*60,.05,'triangle',.04,i*.1)}
+};
+addEventListener('pointerdown',()=>Snd.unlock(),{once:true});
+addEventListener('keydown',()=>Snd.unlock(),{once:true});
+
+/* ---------- Statistiques et historique ---------- */
+const ago=t=>{const m=Math.round((Date.now()-t)/60000);return m<1?"à l'instant":m<60?`il y a ${m} min`:m<1440?`il y a ${Math.round(m/60)} h`:`il y a ${Math.round(m/1440)} j`};
+const Stats={d:{n:0,w:0,best:0,net:0,h:[]},
+ load(){try{const s=JSON.parse(localStorage.getItem('gc_stats'));if(s&&Array.isArray(s.h))this.d=s}catch(e){}},
+ save(){try{localStorage.setItem('gc_stats',JSON.stringify(this.d))}catch(e){}},
+ record(g,bet,pay){
+  const net=Math.round((pay-bet)*100)/100,d=this.d;
+  d.n++;if(net>0)d.w++;if(net>d.best)d.best=net;
+  d.net=Math.round((d.net+net)*100)/100;
+  d.h.unshift({g,net,t:Date.now()});if(d.h.length>15)d.h.length=15;
+  this.save();
+ },
+ reset(){this.d={n:0,w:0,best:0,net:0,h:[]};this.save();this.render()},
+ render(){
+  const d=this.d,rate=d.n?Math.round(d.w/d.n*100):0;
+  $('#stats-kpis').innerHTML=[['Manches jouées',d.n],['Victoires',`${d.w} (${rate} %)`],['Meilleur gain','+'+d.best.toFixed(2)+CR],['Bilan net',(d.net>0?'+':'')+d.net.toFixed(2)+CR]]
+   .map(([l,v])=>`<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join('');
+  $('#stats-hist').innerHTML=d.h.length?d.h.map(r=>`<li class="item"><div class="info"><b>${r.g}</b><span>${ago(r.t)}</span></div><span class="price ${r.net>0?'win':r.net<0?'lose':''}">${r.net>0?'+':''}${r.net.toFixed(2)}${CR}</span></li>`).join(''):
+   `<li class="item"><div class="info"><b>Aucune manche pour l'instant</b><span>Lance un jeu : tes résultats s'afficheront ici.</span></div></li>`;
+ }
+};
+function settle(game,bet,pay){Stats.record(game,bet,pay);pay>0?Snd.win():Snd.lose()}
+function lockNav(on){document.querySelectorAll('.navlink[data-nav]').forEach(b=>b.disabled=on)}
+
+/* ---------- Bonus quotidien ---------- */
+const Daily={KEY:'gc_daily',COOL:20*3600*1000,AMT:100,
+ last(){try{return +localStorage.getItem(this.KEY)||0}catch(e){return 0}},
+ left(){return Math.max(0,this.last()+this.COOL-Date.now())},
+ render(){
+  const b=$('#daily-btn'),l=this.left();
+  if(l<=0){b.disabled=false;b.innerHTML=`Récupérer le bonus du jour : +${this.AMT}${CR}`}
+  else{const tm=Math.ceil(l/60000),h=Math.floor(tm/60),m=tm%60;b.disabled=true;b.textContent=`Prochain bonus dans ${h?h+' h ':''}${m} min`}
+ },
+ claim(){
+  if(this.left()>0)return;
+  try{localStorage.setItem(this.KEY,String(Date.now()))}catch(e){return toast('Bonus indisponible : le navigateur bloque le stockage','lose')}
+  Bank.set(Bank.bal+this.AMT);Snd.win();toast(`Bonus du jour : +${this.AMT}${CR}`,'win');this.render();
+ }
+};
 
 /* ---------- Gestion d'une seule manche à la fois ---------- */
 let current=null;
@@ -430,18 +539,20 @@ function setRunning(g,on){
  $(`#${g}-bet`).disabled=on;
  document.querySelectorAll(`#${g}-page .qb`).forEach(b=>b.disabled=on);
  if(g==='mines')$('#mines-count').disabled=on;
- $('#menu-btn').disabled=$('#shop-btn').disabled=on;Bank.render();
+ if(g==='crash')$('#crash-auto').disabled=on;
+ lockNav(on);Bank.render();
 }
 function navigateTo(id){
  if(current)return;
  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active-page'));
  $('#'+id).classList.add('active-page');toast('');
- $('#menu-btn').classList.toggle('on',id==='lobby');
- $('#shop-btn').classList.toggle('on',id==='shop-page');
+ document.querySelectorAll('.navlink[data-nav]').forEach(b=>b.classList.toggle('on',b.dataset.nav===id));
  window.scrollTo(0,0);
  if(id==='crash-page')Crash.reset();
  if(id==='mines-page')Mines.build(false);
  if(id==='shop-page')Shop.render();
+ if(id==='stats-page')Stats.render();
+ if(id==='lobby')Daily.render();
  if(id==='dice-page')Dice.upd();
  if(id==='admin-page')Admin.show();
 }
@@ -477,6 +588,7 @@ const Crash={raf:0,t0:0,cp:1,bet:0,pts:[],cashed:0,cashPt:null,
   if(current)return;const b=getBet('crash');if(!b||!Bank.take(b))return;
   cancelAnimationFrame(this.raf);
   this.bet=b;this.cashed=0;this.cashPt=null;this.pts=[];
+  const au=parseFloat($('#crash-auto').value);this.auto=au>1?au:0;
   const r=Math.random();this.cp=Math.min(100,Math.max(1,Math.floor(HOUSE*100/(1-r))/100));
   toast('');$('#crash-sub').textContent='';setRunning('crash',true);
   this.t0=performance.now();this.raf=requestAnimationFrame(t=>this.tick(t));
@@ -484,19 +596,20 @@ const Crash={raf:0,t0:0,cp:1,bet:0,pts:[],cashed:0,cashPt:null,
  tick(now){
   const s=(now-this.t0)/1000;let m=Math.exp(0.1*s);const crashed=m>=this.cp;if(crashed)m=this.cp;
   this.pts.push({s,m,crashed});this.render();
+  if(!this.cashed&&this.auto&&this.auto<=m&&this.auto<this.cp)this.cash(this.auto);
   if(this.cashed){$('#crash-sub').textContent=`Encaissé à ${this.cashed.toFixed(2)}x. La courbe continue : ${m.toFixed(2)}x`}
   else this.num(m.toFixed(2)+'x',crashed?col('--loss'):col('--ivory'));
   if(crashed){
    this.raf=0;
    if(this.cashed)$('#crash-sub').textContent=`Encaissé à ${this.cashed.toFixed(2)}x. Le crash est arrivé à ${m.toFixed(2)}x.`;
-   else{$('#crash-sub').textContent='Crash';setRunning('crash',false);toast(`Crash à ${m.toFixed(2)}x : -${this.bet.toFixed(2)}${CR}`,'lose')}
+   else{$('#crash-sub').textContent='Crash';setRunning('crash',false);settle('Crash',this.bet,0);toast(`Crash à ${m.toFixed(2)}x : -${this.bet.toFixed(2)}${CR}`,'lose')}
   }else this.raf=requestAnimationFrame(t=>this.tick(t));
  },
- cash(){
+ cash(at){
   if(current!=='crash'||!this.pts.length)return;
-  const i=this.pts.length-1,m=this.pts[i].m;
+  const i=this.pts.length-1,m=at||this.pts[i].m;
   this.cashed=m;this.cashPt=i;
-  const p=Bank.pay(this.bet*m);setRunning('crash',false);
+  const p=Bank.pay(this.bet*m);setRunning('crash',false);settle('Crash',this.bet,p);
   this.num(m.toFixed(2)+'x',col('--win'));this.render();
   toast(`Encaissé à ${m.toFixed(2)}x : +${(p-this.bet).toFixed(2)}${CR}`,'win');
  }
@@ -528,15 +641,15 @@ const Mines={mines:[],picked:0,bet:0,on:false,n:4,
   if(this.mines.includes(i)){
    this.on=false;c.textContent='💥';c.classList.add('boom');
    this.mines.forEach(m=>{if(m!==i){cells[m].textContent='💣';cells[m].classList.add('ghost')}});
-   cells.forEach(x=>x.disabled=true);setRunning('mines',false);toast(`Boom ! -${this.bet.toFixed(2)}${CR}`,'lose');
-  }else{c.textContent='💎';c.classList.add('gem');this.picked++;this.refresh();if(this.picked===16-this.n)this.cash()}
+   cells.forEach(x=>x.disabled=true);setRunning('mines',false);settle('Mines',this.bet,0);toast(`Boom ! -${this.bet.toFixed(2)}${CR}`,'lose');
+  }else{c.textContent='💎';c.classList.add('gem');this.picked++;Snd.tick(this.picked);this.refresh();if(this.picked===16-this.n)this.cash()}
  },
  cash(){
   if(!this.on||this.picked<1)return;this.on=false;
   const p=Bank.pay(this.bet*this.multAt(this.picked));
   const cells=document.querySelectorAll('.cell');
   this.mines.forEach(m=>{if(!cells[m].textContent){cells[m].textContent='💣';cells[m].classList.add('ghost')}});
-  cells.forEach(x=>x.disabled=true);setRunning('mines',false);toast(`Encaissé : +${(p-this.bet).toFixed(2)}${CR}`,'win');
+  cells.forEach(x=>x.disabled=true);setRunning('mines',false);settle('Mines',this.bet,p);toast(`Encaissé : +${(p-this.bet).toFixed(2)}${CR}`,'win');
  }
 };
 for(let i=1;i<=10;i++){const o=document.createElement('option');o.value=i;o.textContent=i;if(i===4)o.selected=true;$('#mines-count').appendChild(o)}
@@ -568,14 +681,14 @@ const Canyon={raf:0,last:0,score:1,x:300,obs:[],bet:0,
   this.obs.forEach(o=>{o.y+=v*dt;ctx.fillStyle='#8b93b8';ctx.fillRect(o.x,o.y,60,30);
    if(o.y+30>440&&o.y<480&&this.x+16>o.x&&this.x-16<o.x+60)hit=true});
   this.obs=this.obs.filter(o=>o.y<500);
-  ctx.fillStyle=col('--brass');ctx.beginPath();ctx.moveTo(this.x,440);ctx.lineTo(this.x-20,480);ctx.lineTo(this.x+20,480);ctx.fill();
+  const sp=SHIPS[Shop.ship]||SHIPS.base;ctx.save();ctx.translate(this.x,460);ctx.fillStyle=sp.c||col('--brass');ctx.fill(sp.p);ctx.restore();
   $('#canyon-mult').textContent=this.score.toFixed(2)+'x';
-  if(hit){this.raf=0;setRunning('canyon',false);toast(`Collision : -${this.bet.toFixed(2)}${CR}`,'lose');return}
+  if(hit){this.raf=0;setRunning('canyon',false);settle('Canyon',this.bet,0);toast(`Collision : -${this.bet.toFixed(2)}${CR}`,'lose');return}
   this.raf=requestAnimationFrame(t=>this.tick(t));
  },
  cash(){
   if(!this.raf)return;cancelAnimationFrame(this.raf);this.raf=0;
-  const p=Bank.pay(this.bet*this.score);setRunning('canyon',false);
+  const p=Bank.pay(this.bet*this.score);setRunning('canyon',false);settle('Canyon',this.bet,p);
   toast(`Éjection à ${this.score.toFixed(2)}x : +${(p-this.bet).toFixed(2)}${CR}`,'win');
  }
 };
@@ -583,14 +696,14 @@ const Canyon={raf:0,last:0,score:1,x:300,obs:[],bet:0,
 /* ---------- PILE OU FACE ---------- */
 const Coin={play(side){
  if(current)return;const b=getBet('coin');if(!b||!Bank.take(b))return;
- current='coin';$('#menu-btn').disabled=$('#shop-btn').disabled=true;Bank.render();toast('');
+ current='coin';lockNav(true);Bank.render();toast('');
  const f=$('#coin-face');f.firstElementChild.textContent='...';
- f.classList.remove('flip');void f.offsetWidth;f.classList.add('flip');
+ f.classList.remove('flip');void f.offsetWidth;f.classList.add('flip');Snd.flip();
  setTimeout(()=>{
   const r=Math.random()<.5?'Pile':'Face';f.firstElementChild.textContent=r;
-  if(r===side){const p=Bank.pay(b*2*HOUSE);toast(`${r} : +${(p-b).toFixed(2)}${CR}`,'win')}
-  else toast(`${r} : -${b.toFixed(2)}${CR}`,'lose');
-  current=null;$('#menu-btn').disabled=$('#shop-btn').disabled=false;Bank.render();
+  if(r===side){const p=Bank.pay(b*2*HOUSE);settle('Pile ou face',b,p);toast(`${r} : +${(p-b).toFixed(2)}${CR}`,'win')}
+  else{settle('Pile ou face',b,0);toast(`${r} : -${b.toFixed(2)}${CR}`,'lose')}
+  current=null;lockNav(false);Bank.render();
  },700);
 }};
 
@@ -603,8 +716,8 @@ const Dice={
   if(current)return;const b=getBet('dice');if(!b||!Bank.take(b))return;
   const x=+$('#dice-slider').value,roll=1+Math.floor(Math.random()*100),d=$('#dice-res');
   d.textContent=roll;d.className='die';
-  if(roll<x){d.classList.add('win');const p=Bank.pay(b*HOUSE*100/(x-1));toast(`${roll} sous ${x} : +${(p-b).toFixed(2)}${CR}`,'win')}
-  else{d.classList.add('lose');toast(`${roll} sur ${x} ou plus : -${b.toFixed(2)}${CR}`,'lose')}
+  if(roll<x){d.classList.add('win');const p=Bank.pay(b*HOUSE*100/(x-1));settle('Dés',b,p);toast(`${roll} sous ${x} : +${(p-b).toFixed(2)}${CR}`,'win')}
+  else{d.classList.add('lose');settle('Dés',b,0);toast(`${roll} sur ${x} ou plus : -${b.toFixed(2)}${CR}`,'lose')}
  }
 };
 
@@ -624,10 +737,11 @@ const Admin={ok:false,fails:0,until:0,
  add(sign){if(!this.ok)return;Bank.set(Bank.bal+sign*this.amt());toast('Solde mis à jour','win')},
  setBal(){if(!this.ok)return;Bank.set(this.amt());toast('Solde défini','win')},
  unlockAll(){if(!this.ok)return;Shop.own=ITEMS.map(i=>i.id);Shop.save();Shop.apply();toast('Boutique débloquée','win')},
- resetShop(){if(!this.ok)return;Shop.own=['th-base','b-none'];Shop.theme='base';Shop.badge='';Shop.save();Shop.apply();toast('Achats réinitialisés','win')}
+ resetShop(){if(!this.ok)return;Shop.own=['th-base','b-none','sh-base'];Shop.theme='base';Shop.badge='';Shop.ship='base';Shop.save();Shop.apply();toast('Achats réinitialisés','win')},
+ resetStats(){if(!this.ok)return;Stats.reset();toast('Statistiques effacées','win')}
 };
 
-Shop.load();Bank.load();Crash.reset();Mines.build(false);Dice.upd();
+Shop.load();Bank.load();Snd.load();Stats.load();Daily.render();setInterval(()=>Daily.render(),30000);Crash.reset();Mines.build(false);Dice.upd();
 setTimeout(()=>document.body.classList.remove('intro'),1600);
 </script>
 </body>
