@@ -50,25 +50,72 @@ button{font-family:inherit;color:inherit}
 .active-page{display:block}
 
 /* Lobby : les jetons */
-.hero{text-align:center;padding:18px 0 8px}
-.hero h1{font-family:var(--f-d);font-weight:700;font-size:clamp(2rem,6vw,3.4rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 10px}
-.hero p{margin:0 auto;max-width:34ch;color:var(--mute)}
-.tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;padding:26px 0 10px}
-.tile{--c:#c8323a;grid-column:span 2;position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:250px;
-  border:0;border-radius:26px;padding:22px;text-align:left;cursor:pointer;overflow:hidden;color:var(--ivory);
-  background:linear-gradient(160deg,color-mix(in srgb,var(--c) 100%,#fff 8%),color-mix(in srgb,var(--c) 70%,#000))}
-.tile.wide{grid-column:span 3;min-height:290px}
-.tile .art{position:absolute;left:0;right:0;top:0;height:68%;display:grid;place-items:center;pointer-events:none}
-.tile .art svg{width:78%;height:86%;transition:transform .3s cubic-bezier(.2,.9,.3,1.2)}
-.tile:hover .art svg{transform:translateY(-4px) scale(1.04)}
-.tile h2{position:relative;font-family:var(--f-d);font-weight:700;font-size:1.45rem;letter-spacing:-.02em;margin:0}
-.tile p{position:relative;margin:2px 0 0;font-size:.95rem;color:rgba(244,239,224,.82)}
+/* En-tête du lobby + ticket bonus */
+.lobby-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:20px 32px;padding:26px 0 6px}
+.lobby-head h1{font-family:var(--f-d);font-weight:700;font-size:clamp(2.2rem,6vw,3.6rem);line-height:1.05;letter-spacing:-.035em;margin:0 0 10px}
+.lobby-head p{margin:0;color:var(--mute);max-width:52ch;text-wrap:pretty}
+.lobby-head .recap{margin-top:6px;color:var(--ivory);font-variant-numeric:tabular-nums}
+.ticket{position:relative;display:flex;align-items:stretch;min-width:310px;background:var(--brass);color:var(--brass-ink);border-radius:18px;box-shadow:0 18px 36px -20px var(--brass);transition:background .3s,color .3s}
+.ticket::before,.ticket::after{content:"";position:absolute;left:calc(100% - 128px);width:18px;height:18px;margin-left:-9px;border-radius:50%;background:var(--void)}
+.ticket::before{top:-9px}.ticket::after{bottom:-9px}
+.t-main{flex:1;padding:14px 18px;display:flex;flex-direction:column;gap:1px}
+.t-label{font-size:.85rem;font-weight:600;opacity:.75}
+.t-amt{font:700 1.7rem var(--f-d);letter-spacing:-.02em;line-height:1.15;font-variant-numeric:tabular-nums}
+.t-note{font-size:.82rem;opacity:.8}
+.t-stub{width:128px;display:grid;place-items:center;border-left:2px dashed rgba(42,28,0,.35);padding:10px}
+.ticket .mini{background:var(--brass-ink);color:var(--brass);padding:10px 16px;font-size:.9rem}
+.ticket.used{background:var(--void2);color:var(--mute);box-shadow:inset 0 0 0 1px var(--line)}
+.ticket.used .t-stub{border-left-color:var(--line)}
+.ticket.used .mini,.ticket.used .mini:disabled{background:rgba(255,255,255,.06);color:var(--mute);opacity:1}
+@media (max-width:640px){.lobby-head{grid-template-columns:1fr}.ticket{min-width:0}}
+
+/* Vignettes de jeux */
+.tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;padding:22px 0 10px}
+.tile{--c:#c8323a;grid-column:span 2;position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:flex-end;min-height:260px;
+  border:0;border-radius:26px;padding:20px 22px;text-align:left;cursor:pointer;overflow:hidden;color:var(--ivory);
+  background:radial-gradient(70% 60% at 50% 32%,color-mix(in srgb,var(--c),#fff 20%) 0%,transparent 72%),linear-gradient(165deg,color-mix(in srgb,var(--c),#fff 6%),color-mix(in srgb,var(--c) 60%,#000));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 0 0 1px rgba(255,255,255,.07),0 24px 44px -26px var(--c);
+  transition:transform .25s cubic-bezier(.2,.9,.3,1.2),box-shadow .25s}
+.tile::before{content:"";position:absolute;inset:0;z-index:-1;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");opacity:.25;mix-blend-mode:overlay;pointer-events:none}
+.tile:hover{transform:translateY(-5px);box-shadow:inset 0 1px 0 rgba(255,255,255,.34),inset 0 0 0 1px rgba(255,255,255,.12),0 34px 56px -26px var(--c)}
+.tile:active{transform:translateY(-1px) scale(.99)}
+.tile.wide{grid-column:span 3;min-height:300px}
+.tile:not(.wide){min-height:300px}
+.tile:not(.wide) .meta{flex-direction:column;align-items:flex-start;gap:10px}
+.tile .art{position:relative;flex:1 1 auto;min-height:100px;margin-bottom:10px;pointer-events:none}
+.tile .art svg{position:absolute;left:10%;top:4%;width:80%;height:96%;overflow:visible}
+.meta{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.txt{display:flex;flex-direction:column;min-width:0}
+.tname{font-family:var(--f-d);font-weight:700;font-size:1.45rem;letter-spacing:-.02em;line-height:1.15}
+.tdesc{font-size:.95rem;color:rgba(244,239,224,.86)}
+.last{font-size:.85rem;color:rgba(244,239,224,.74);margin-top:5px;font-variant-numeric:tabular-nums}
+.last:empty{display:none}
+.odds{flex-shrink:0;font:600 .8rem var(--f-d);padding:7px 11px;border-radius:999px;background:rgba(0,0,0,.24);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);white-space:nowrap}
+.curve,.area,.tip,.gem-c,.bomb-c,.ship,.ast,.coin-g,.die-g{transform-box:fill-box;transform-origin:center}
+.tile .curve{stroke-dasharray:240;stroke-dashoffset:0}
+.tile:hover .curve{animation:draw .9s ease-out}
+.tile:hover .area{animation:fadein .9s ease-out}
+.tile:hover .tip{animation:pop .35s .7s cubic-bezier(.2,.9,.3,1.6) both}
+.tile:hover .gem-c{animation:pop .45s cubic-bezier(.2,.9,.3,1.5) both}
+.tile:hover .bomb-c{animation:shake .5s .45s both}
+.tile:hover .ship{animation:sway 1.4s ease-in-out infinite}
+.tile:hover .ast{animation:drift 1.4s linear infinite}
+.tile:hover .coin-g{animation:flipx .8s ease-in-out}
+.tile:hover .die-g{animation:roll .8s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes draw{from{stroke-dashoffset:240}}
+@keyframes fadein{from{opacity:0}}
+@keyframes pop{from{transform:scale(0)}}
+@keyframes shake{25%{transform:translateX(-3px)}50%{transform:translateX(3px)}75%{transform:translateX(-2px)}}
+@keyframes sway{50%{transform:translateX(-8px) rotate(-8deg)}}
+@keyframes drift{0%{transform:translateY(-6px);opacity:.3}30%{opacity:1}100%{transform:translateY(16px);opacity:0}}
+@keyframes flipx{50%{transform:scaleX(.06)}}
+@keyframes roll{from{transform:rotate(-220deg) scale(.8)}}
 .foot{text-align:center;margin-top:30px}
 .linkbtn{background:none;border:0;color:var(--mute);font:400 .9rem var(--f-b);text-decoration:underline;cursor:pointer;padding:8px}
 .intro .tile{animation:rise .6s cubic-bezier(.2,.9,.3,1.1) both;animation-delay:calc(var(--i)*80ms)}
 @keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
-@media (max-width:820px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.tile,.tile.wide{grid-column:span 1;min-height:220px}.tile.wide:first-child{grid-column:span 2}}
-@media (max-width:480px){.tiles{grid-template-columns:1fr}.tile.wide:first-child{grid-column:span 1}}
+@media (max-width:820px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.tile,.tile.wide{grid-column:span 1;min-height:270px}.tile:not(.wide){min-height:290px}.tile.wide:first-child{grid-column:span 2}}
+@media (max-width:480px){.tiles{grid-template-columns:1fr}.tile.wide:first-child{grid-column:span 1}.tile,.tile.wide,.tile:not(.wide){min-height:270px}.tile:not(.wide) .meta{flex-direction:row;align-items:flex-end}.t-stub{width:112px}.ticket::before,.ticket::after{left:calc(100% - 112px)}}
 
 /* Écran de jeu : scène en feutre + panneau de mise */
 .game{display:none;grid-template-columns:minmax(0,1fr) 300px;gap:22px;align-items:start;padding-top:12px}
@@ -151,9 +198,6 @@ select option{background:var(--void2)}
 .kpi{background:var(--void2);border:1px solid var(--line);border-radius:18px;padding:16px}
 .kpi b{display:block;font:500 1.25rem var(--f-d);font-variant-numeric:tabular-nums}
 .kpi span{color:var(--mute);font-size:.9rem}
-.daily{margin-top:18px}
-.daily .mini{padding:11px 20px;font-size:.95rem}
-#daily-btn:disabled{opacity:1;background:var(--void2);color:var(--mute);border:1px solid var(--line)}
 @media (max-width:600px){
   .top{gap:6px 12px;padding:10px 14px}
   .top .brand{order:1;font-size:.9rem}
@@ -186,19 +230,31 @@ select option{background:var(--void2)}
 
 <!-- Lobby -->
 <main id="lobby" class="page active-page">
-  <div class="hero">
-    <h1>Pose ta mise</h1>
-    <p>Cinq jeux, des crédits virtuels : rien ne se joue pour de vrai.</p>
-    <div class="daily"><button class="mini" id="daily-btn" onclick="Daily.claim()"></button></div>
+  <div class="lobby-head">
+    <div>
+      <h1>Pose ta mise</h1>
+      <p>Cinq jeux, des crédits virtuels : rien ne se joue pour de vrai.</p>
+      <p class="recap" id="lobby-recap"></p>
+    </div>
+    <div class="ticket" id="ticket">
+      <div class="t-main">
+        <span class="t-label">Bonus du jour</span>
+        <span class="t-amt">+100<i class="cr" role="img" aria-label="crédits"></i></span>
+        <span class="t-note" id="daily-note"></span>
+      </div>
+      <div class="t-stub"><button class="mini" id="daily-btn" onclick="Daily.claim()"></button></div>
+    </div>
   </div>
   <div class="tiles">
     <button class="tile wide" style="--c:#c8323a;--i:0" onclick="navigateTo('crash-page')">
       <span class="art" aria-hidden="true"><svg viewBox="0 0 220 110" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <defs><linearGradient id="lg-crash" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4efe0" stop-opacity=".35"/><stop offset="1" stop-color="#f4efe0" stop-opacity="0"/></linearGradient></defs>
         <path d="M14 96H206M14 96V8" stroke="rgba(244,239,224,.3)" stroke-width="2"/>
         <path d="M14 70H206M14 44H206M14 18H206" stroke="rgba(244,239,224,.12)" stroke-width="1.5"/>
-        <path d="M14 95C80 93 130 78 186 20" stroke="#f4efe0" stroke-width="6"/>
-        <circle cx="186" cy="20" r="9" fill="#f4efe0"/></svg></span>
-      <h2>Crash</h2><p>Encaisse avant que la courbe s'effondre</p>
+        <path class="area" d="M14 95C80 93 130 78 186 20V96H14Z" fill="url(#lg-crash)"/>
+        <path class="curve" d="M14 95C80 93 130 78 186 20" stroke="#f4efe0" stroke-width="6"/>
+        <circle class="tip" cx="186" cy="20" r="9" fill="#f4efe0"/></svg></span>
+      <span class="meta"><span class="txt"><span class="tname">Crash</span><span class="tdesc">Encaisse avant que la courbe s'effondre</span><span class="last" data-g="Crash"></span></span><span class="odds">jusqu'à 100x</span></span>
     </button>
     <button class="tile wide" style="--c:#127a63;--i:1" onclick="navigateTo('mines-page')">
       <span class="art" aria-hidden="true"><svg viewBox="0 0 110 110">
@@ -207,30 +263,39 @@ select option{background:var(--void2)}
           <rect x="3" y="30" width="23" height="23" rx="5"/><rect x="57" y="30" width="23" height="23" rx="5"/><rect x="84" y="30" width="23" height="23" rx="5"/>
           <rect x="30" y="57" width="23" height="23" rx="5"/><rect x="57" y="57" width="23" height="23" rx="5"/><rect x="84" y="57" width="23" height="23" rx="5"/>
           <rect x="3" y="84" width="23" height="23" rx="5"/><rect x="30" y="84" width="23" height="23" rx="5"/><rect x="84" y="84" width="23" height="23" rx="5"/></g>
-        <g fill="#f4efe0"><rect x="57" y="3" width="23" height="23" rx="5"/><rect x="30" y="30" width="23" height="23" rx="5"/><rect x="3" y="57" width="23" height="23" rx="5"/></g>
-        <rect x="57" y="84" width="23" height="23" rx="5" fill="#ff6b6b"/>
-        <g fill="#127a63"><path d="M68.5 8l5 6.5-5 6.5-5-6.5z"/><path d="M41.5 35l5 6.5-5 6.5-5-6.5z"/><path d="M14.5 62l5 6.5-5 6.5-5-6.5z"/></g>
-        <circle cx="68.5" cy="96" r="5" fill="#2b0505"/></svg></span>
-      <h2>Mines</h2><p>Trouve les diamants, évite les bombes</p>
+        <g class="gem-c"><rect x="57" y="3" width="23" height="23" rx="5" fill="#f4efe0"/><path d="M68.5 8l5 6.5-5 6.5-5-6.5z" fill="#127a63"/></g>
+        <g class="gem-c" style="animation-delay:.12s"><rect x="30" y="30" width="23" height="23" rx="5" fill="#f4efe0"/><path d="M41.5 35l5 6.5-5 6.5-5-6.5z" fill="#127a63"/></g>
+        <g class="gem-c" style="animation-delay:.24s"><rect x="3" y="57" width="23" height="23" rx="5" fill="#f4efe0"/><path d="M14.5 62l5 6.5-5 6.5-5-6.5z" fill="#127a63"/></g>
+        <g class="bomb-c"><rect x="57" y="84" width="23" height="23" rx="5" fill="#ff6b6b"/><circle cx="68.5" cy="96" r="5" fill="#2b0505"/></g></svg></span>
+      <span class="meta"><span class="txt"><span class="tname">Mines</span><span class="tdesc">Trouve les diamants, évite les bombes</span><span class="last" data-g="Mines"></span></span><span class="odds">1 à 10 mines</span></span>
     </button>
     <button class="tile" style="--c:#2b4fd1;--i:2" onclick="navigateTo('canyon-page')">
-      <span class="art" aria-hidden="true"><svg viewBox="0 0 120 110">
-        <g fill="rgba(244,239,224,.28)"><rect x="8" y="8" width="34" height="14" rx="3"/><rect x="72" y="26" width="34" height="14" rx="3"/><rect x="22" y="50" width="34" height="14" rx="3"/></g>
-        <path d="M84 70 98 100 84 93 70 100Z" fill="#f4efe0"/></svg></span>
-      <h2>Canyon</h2><p>Pilote entre les rochers</p>
+      <span class="art" aria-hidden="true"><svg viewBox="0 0 120 110" stroke-linejoin="round">
+        <g class="ast" fill="rgba(244,239,224,.26)" stroke="rgba(244,239,224,.6)" stroke-width="1.3">
+          <path d="M12 12 24 7 33 15 30 27 18 30 9 22Z"/><path d="M80 24 92 22 99 31 94 41 82 40 77 32Z"/><path d="M36 50 45 47 51 54 47 62 38 62 33 56Z"/></g>
+        <g fill="#ffd36b"><circle cx="64" cy="14" r="8" opacity=".25"/><circle cx="64" cy="14" r="3.6"/><circle cx="20" cy="74" r="7" opacity=".25"/><circle cx="20" cy="74" r="3.2"/><circle cx="104" cy="62" r="7" opacity=".25"/><circle cx="104" cy="62" r="3.2"/></g>
+        <g class="ship"><path d="M80 93 84 106 88 93Z" fill="#ffb347"/><path d="M84 62 97 95 84 88 71 95Z" fill="#f4efe0"/></g></svg></span>
+      <span class="meta"><span class="txt"><span class="tname">Canyon</span><span class="tdesc">Pilote entre les astéroïdes</span><span class="last" data-g="Canyon"></span></span><span class="odds">+0.10x par orbe</span></span>
     </button>
     <button class="tile" style="--c:#b8791a;--i:3" onclick="navigateTo('coin-page')">
-      <span class="art" aria-hidden="true"><svg viewBox="0 0 120 110">
-        <ellipse cx="60" cy="96" rx="30" ry="5" fill="rgba(0,0,0,.25)"/>
-        <circle cx="60" cy="48" r="38" fill="#f4efe0"/><circle cx="60" cy="48" r="28" fill="none" stroke="#b8791a" stroke-width="3"/>
-        <text x="60" y="58" text-anchor="middle" font-family="Unbounded,sans-serif" font-weight="700" font-size="28" fill="#b8791a">P</text></svg></span>
-      <h2>Pile ou face</h2><p>Une chance sur deux</p>
+      <span class="art" aria-hidden="true"><svg viewBox="0 0 120 110" fill="none">
+        <ellipse cx="60" cy="98" rx="28" ry="5" fill="rgba(0,0,0,.25)"/>
+        <g class="coin-g">
+          <circle cx="60" cy="48" r="38" fill="#f4efe0"/>
+          <circle cx="60" cy="48" r="31" stroke="#b8791a" stroke-width="2" stroke-dasharray="3 4" opacity=".75"/>
+          <path d="M37 48A23 7.5 0 0 1 83 48" transform="rotate(-22 60 48)" stroke="#8a5a0f" stroke-width="4.5"/>
+          <circle cx="60" cy="48" r="12" fill="#8a5a0f"/>
+          <path d="M37 48A23 7.5 0 0 0 83 48" transform="rotate(-22 60 48)" stroke="#8a5a0f" stroke-width="4.5"/>
+          <ellipse cx="45" cy="28" rx="10" ry="4" fill="#fff" opacity=".55" transform="rotate(-35 45 28)"/></g></svg></span>
+      <span class="meta"><span class="txt"><span class="tname">Pile ou face</span><span class="tdesc">Une chance sur deux</span><span class="last" data-g="Pile ou face"></span></span><span class="odds">x1.94</span></span>
     </button>
     <button class="tile" style="--c:#6b3fd4;--i:4" onclick="navigateTo('dice-page')">
       <span class="art" aria-hidden="true"><svg viewBox="0 0 120 110">
-        <rect x="24" y="12" width="72" height="72" rx="16" fill="#f4efe0" transform="rotate(-8 60 48)"/>
-        <g fill="#6b3fd4" transform="rotate(-8 60 48)"><circle cx="42" cy="30" r="6"/><circle cx="78" cy="30" r="6"/><circle cx="60" cy="48" r="6"/><circle cx="42" cy="66" r="6"/><circle cx="78" cy="66" r="6"/></g></svg></span>
-      <h2>Dés</h2><p>Choisis ton risque, choisis ta cote</p>
+        <ellipse cx="60" cy="98" rx="30" ry="5" fill="rgba(0,0,0,.25)"/>
+        <g class="die-g">
+          <rect x="24" y="12" width="72" height="72" rx="16" fill="#f4efe0" transform="rotate(-8 60 48)"/>
+          <g fill="#6b3fd4" transform="rotate(-8 60 48)"><circle cx="42" cy="30" r="6"/><circle cx="78" cy="30" r="6"/><circle cx="60" cy="48" r="6"/><circle cx="42" cy="66" r="6"/><circle cx="78" cy="66" r="6"/></g></g></svg></span>
+      <span class="meta"><span class="txt"><span class="tname">Dés</span><span class="tdesc">Choisis ton risque, choisis ta cote</span><span class="last" data-g="Dés"></span></span><span class="odds">jusqu'à 97x</span></span>
     </button>
   </div>
   <div class="foot"><button class="linkbtn" onclick="navigateTo('admin-page')">Administration</button></div>
@@ -507,15 +572,23 @@ const Daily={KEY:'gc_daily',COOL:20*3600*1000,AMT:100,
  left(){return Math.max(0,this.last()+this.COOL-Date.now())},
  render(){
   const b=$('#daily-btn'),l=this.left();
-  if(l<=0){b.disabled=false;b.innerHTML=`Récupérer le bonus du jour : +${this.AMT}${CR}`}
-  else{const tm=Math.ceil(l/60000),h=Math.floor(tm/60),m=tm%60;b.disabled=true;b.textContent=`Prochain bonus dans ${h?h+' h ':''}${m} min`}
+  const n=$('#daily-note');$('#ticket').classList.toggle('used',l>0);
+  if(l<=0){b.disabled=false;b.textContent='Récupérer';n.textContent='Disponible maintenant'}
+  else{const tm=Math.ceil(l/60000),h=Math.floor(tm/60),m=tm%60;b.disabled=true;b.textContent='Récupéré';n.textContent='Prochain bonus dans '+[h?h+' h':'',m?m+' min':''].filter(Boolean).join(' ')}
  },
  claim(){
   if(this.left()>0)return;
   try{localStorage.setItem(this.KEY,String(Date.now()))}catch(e){return toast('Bonus indisponible : le navigateur bloque le stockage','lose')}
-  Bank.set(Bank.bal+this.AMT);Snd.win();toast(`Bonus du jour : +${this.AMT}${CR}`,'win');this.render();
+  Bank.set(Bank.bal+this.AMT);Snd.win();toast(`Bonus du jour : +${this.AMT}${CR}`,'win');this.render();Lobby.render();
  }
 };
+
+/* ---------- Lobby : résumé et dernier résultat par jeu ---------- */
+const Lobby={render(){
+ const d=Stats.d,sign=v=>(v>0?'+':'')+v.toFixed(2)+CR;
+ $('#lobby-recap').innerHTML=d.n?`Tu as joué ${d.n} manche${d.n>1?'s':''}. Bilan net : ${sign(d.net)}`:'Choisis un jeu pour commencer.';
+ document.querySelectorAll('.last[data-g]').forEach(el=>{const r=d.h.find(x=>x.g===el.dataset.g);el.innerHTML=r?`Dernière manche : ${sign(r.net)}`:''});
+}};
 
 /* ---------- Gestion d'une seule manche à la fois ---------- */
 let current=null;
@@ -554,7 +627,7 @@ function navigateTo(id){
  if(id==='mines-page')Mines.build(false);
  if(id==='shop-page')Shop.render();
  if(id==='stats-page')Stats.render();
- if(id==='lobby')Daily.render();
+ if(id==='lobby'){Daily.render();Lobby.render()}
  if(id==='dice-page')Dice.upd();
  if(id==='admin-page')Admin.show();
 }
@@ -847,7 +920,7 @@ const Admin={ok:false,fails:0,until:0,
  resetStats(){if(!this.ok)return;Stats.reset();toast('Statistiques effacées','win')}
 };
 
-Shop.load();Bank.load();Snd.load();Stats.load();Canyon.loadBest();Daily.render();setInterval(()=>Daily.render(),30000);Crash.reset();Mines.build(false);Dice.upd();
+Shop.load();Bank.load();Snd.load();Stats.load();Canyon.loadBest();Lobby.render();Daily.render();setInterval(()=>Daily.render(),30000);Crash.reset();Mines.build(false);Dice.upd();
 setTimeout(()=>document.body.classList.remove('intro'),1600);
 </script>
 </body>
