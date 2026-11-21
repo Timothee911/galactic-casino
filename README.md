@@ -5,7 +5,7 @@ Petit casino en un seul fichier HTML, jouable dans le navigateur, avec des **cr�
 ## Jeux
 - 🚀 **Crash** : encaisse avant le crash, la courbe et le multiplicateur sont synchronisés
 - 💣 **Mines** : grille de 16 cases, de 1 à 10 mines
-- 🛸 **Canyon** : pilote avec les flèches ← →
+- 🛸 **Canyon** : pilote entre les rochers (flèches, Q et D, ou au doigt) et ramasse les orbes dorés
 - 🪙 **Pile ou face** : cote x1.94
 - 🎲 **Dés** : choisis ton seuil et ta cote
 
