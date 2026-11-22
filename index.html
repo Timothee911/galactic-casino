@@ -209,6 +209,69 @@ select option{background:var(--void2)}
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
+/* Nouveaux jeux */
+.tile .art svg text{font-family:var(--f-d);font-weight:700}
+.pl-ball,.wheel-g,.kn-d,.tw-b,.cd-a,.cd-b,.rl{transform-box:fill-box;transform-origin:center}
+.tile:hover .pl-ball{animation:drop .9s cubic-bezier(.5,0,.8,.6)}
+.tile:hover .wheel-g{animation:spin 1.1s cubic-bezier(.2,.7,.2,1)}
+.tile:hover .cd-a{animation:cardA .5s ease-out both}
+.tile:hover .cd-b{animation:cardB .5s ease-out both}
+.tile:hover .kn-d{animation:pop .4s cubic-bezier(.2,.9,.3,1.5) both}
+.tile:hover .tw-b{animation:pop .4s cubic-bezier(.2,.9,.3,1.5) both}
+.tile:hover .rl{animation:reel .6s ease-in-out}
+@keyframes drop{0%{transform:translateY(-14px)}60%{transform:translateY(8px)}100%{transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(540deg)}}
+@keyframes cardA{from{transform:rotate(0)}to{transform:rotate(-9deg) translateX(-4px)}}
+@keyframes cardB{from{transform:rotate(0)}to{transform:rotate(8deg) translateX(4px)}}
+@keyframes reel{0%{transform:translateY(0)}35%{transform:translateY(-10px)}70%{transform:translateY(6px)}100%{transform:translateY(0)}}
+.stage .center{display:grid;place-items:center}
+#plinko-canvas{width:min(100%,600px);margin:0 auto}
+.wheel-wrap{position:relative;width:min(100%,420px);margin:4px auto 0}
+.wheel-wrap::after{content:"";position:absolute;left:50%;top:-6px;width:0;height:0;margin-left:-14px;border:14px solid transparent;border-top:26px solid var(--brass);border-bottom:0;filter:drop-shadow(0 3px 4px rgba(0,0,0,.45));z-index:2}
+#wheel-canvas{width:100%;border-radius:50%;box-shadow:0 14px 34px rgba(0,0,0,.4);transition:transform 4s cubic-bezier(.12,.7,.1,1)}
+.pcards{display:flex;align-items:flex-end;justify-content:center;gap:8px;min-height:176px;margin:10px 0 4px;flex-wrap:wrap}
+.pcard{position:relative;width:110px;height:154px;border-radius:14px;background:var(--ivory);color:#151c3d;display:grid;place-items:center;box-shadow:0 10px 22px rgba(0,0,0,.35);font-family:var(--f-d)}
+.pcard b{font-size:2.4rem;line-height:1}
+.pcard i{position:absolute;right:10px;bottom:6px;font-style:normal;font-size:1.5rem}
+.pcard.red{color:#c8323a}
+.pcard.sm{width:56px;height:78px;border-radius:9px;opacity:.6;box-shadow:none}
+.pcard.sm b{font-size:1.2rem}.pcard.sm i{font-size:.9rem;right:5px;bottom:3px}
+.pcard.back{background:repeating-linear-gradient(45deg,#2b4fd1 0 8px,#1f3a9e 8px 16px);color:var(--ivory)}
+.pcard.fresh{animation:deal .35s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes deal{from{transform:translateY(-26px) rotate(-6deg);opacity:0}to{transform:none;opacity:1}}
+.acts{display:none;grid-template-columns:1fr 1fr;gap:10px}
+.acts .full{grid-column:1/-1}
+.acts.on{display:grid}
+.acts .btn{padding:13px 8px;font-size:.82rem}
+.paytable .s7{font:700 1em var(--f-d);color:#ff8a80;letter-spacing:.05em}
+.reels{display:flex;gap:12px;justify-content:center;margin:12px 0 18px}
+.reel{width:min(26vw,118px);aspect-ratio:3/4;border-radius:18px;background:var(--ivory);color:#c8323a;display:grid;place-items:center;font-size:clamp(2.6rem,10vw,4.4rem);box-shadow:inset 0 0 0 4px rgba(42,28,0,.18),0 8px 0 rgba(0,0,0,.35);transition:transform .2s,background .2s}
+.reel .s7{font:700 1em var(--f-d);color:#c8323a}
+.reel.spin{filter:blur(1.6px);transform:translateY(2px)}
+.reel.win{background:var(--win)}
+.paytable{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 18px;max-width:420px;margin:0 auto;font-size:.95rem;color:rgba(244,239,224,.85)}
+.paytable div{display:flex;justify-content:space-between;gap:10px}
+.paytable b{font-variant-numeric:tabular-nums}
+.keno-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;max-width:400px;margin:8px auto}
+.kn{aspect-ratio:1;border-radius:50%;background:rgba(0,0,0,.28);border:2px solid rgba(244,239,224,.18);font:700 1.1rem var(--f-d);cursor:pointer;padding:0;transition:transform .12s}
+.kn:hover:not(:disabled){transform:scale(1.06)}
+.kn:disabled{cursor:default}
+.kn.pick{border-color:var(--brass);background:rgba(242,184,75,.22)}
+.kn.drawn{background:rgba(244,239,224,.3);color:var(--ivory)}
+.kn.hit{background:var(--win);border-color:var(--win);color:#06281a}
+.kn-pay{text-align:center;color:rgba(244,239,224,.85);min-height:3em;font-size:.95rem}
+.tower{display:flex;flex-direction:column;gap:8px;max-width:440px;margin:6px auto 0}
+.tw-row{display:grid;grid-template-columns:70px minmax(0,1fr);gap:10px;align-items:center}
+.tw-m{font:700 .85rem var(--f-d);color:rgba(244,239,224,.55);text-align:right;font-variant-numeric:tabular-nums}
+.tw-row.cur .tw-m{color:var(--brass)}
+.tw-tiles{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
+.tw-t{height:40px;border-radius:12px;background:rgba(0,0,0,.28);border:1px solid rgba(244,239,224,.18);font-size:1.2rem;padding:0;cursor:pointer}
+.tw-row.cur .tw-t:not(:disabled){border-color:var(--brass)}
+.tw-row.cur .tw-t:hover:not(:disabled){background:rgba(242,184,75,.22)}
+.tw-t:disabled{cursor:default}
+.tw-t.safe{background:var(--win);border-color:var(--win)}
+.tw-t.trap{background:var(--loss);border-color:var(--loss)}
+.tw-t.ghost{opacity:.5}
 </style>
 </head>
 <body class="intro">
@@ -233,7 +296,7 @@ select option{background:var(--void2)}
   <div class="lobby-head">
     <div>
       <h1>Pose ta mise</h1>
-      <p>Cinq jeux, des crédits virtuels : rien ne se joue pour de vrai.</p>
+      <p>Onze jeux, des crédits virtuels : rien ne se joue pour de vrai.</p>
       <p class="recap" id="lobby-recap"></p>
     </div>
     <div class="ticket" id="ticket">
@@ -297,6 +360,53 @@ select option{background:var(--void2)}
           <g fill="#6b3fd4" transform="rotate(-8 60 48)"><circle cx="42" cy="30" r="6"/><circle cx="78" cy="30" r="6"/><circle cx="60" cy="48" r="6"/><circle cx="42" cy="66" r="6"/><circle cx="78" cy="66" r="6"/></g></g></svg></span>
       <span class="meta"><span class="txt"><span class="tname">Dés</span><span class="tdesc">Choisis ton risque, choisis ta cote</span><span class="last" data-g="Dés"></span></span><span class="odds">jusqu'à 97x</span></span>
     </button>
+    <button class="tile" style="--c:#0e86a8;--i:5" onclick="navigateTo('plinko-page')">
+      <span class="art" aria-hidden="true"><svg viewBox="0 0 120 110">
+        <g fill="rgba(244,239,224,.7)"><circle cx="60" cy="22" r="3.4"/><circle cx="45" cy="38" r="3.4"/><circle cx="75" cy="38" r="3.4"/><circle cx="30" cy="54" r="3.4"/><circle cx="60" cy="54" r="3.4"/><circle cx="90" cy="54" r="3.4"/><circle cx="15" cy="70" r="3.4"/><circle cx="45" cy="70" r="3.4"/><circle cx="75" cy="70" r="3.4"/><circle cx="105" cy="70" r="3.4"/></g>
+        <g fill="rgba(0,0,0,.25)"><rect x="4" y="84" width="22" height="16" rx="5"/><rect x="30" y="84" width="22" height="16" rx="5"/><rect x="68" y="84" width="22" height="16" rx="5"/><rect x="94" y="84" width="22" height="16" rx="5"/></g>
+        <rect x="49" y="84" width="22" height="16" rx="5" fill="#ffd36b"/>
+        <circle class="pl-ball" cx="60" cy="8" r="6" fill="#f4efe0"/></svg></span>
+      <span class="meta"><span class="txt"><span class="tname">Plinko</span><span class="tdesc">Laisse rebondir la bille</span><span class="last" data-g="Plinko"></span></span><span class="odds">jusqu'à 28x</span></span>
+    </button>
+    <button class="tile" style="--c:#b8338a;--i:6" onclick="navigateTo('wheel-page')">
+      <span class="art" aria-hidden="true"><svg viewBox="0 0 120 110">
+        <g class="wheel-g"><circle cx="60" cy="56" r="44" fill="#f4efe0"/>
+        <path d="M60 56 60 12A44 44 0 0 1 91 25Z M60 56 104 56A44 44 0 0 1 91 87Z M60 56 60 100A44 44 0 0 1 29 87Z M60 56 16 56A44 44 0 0 1 29 25Z" fill="#b8338a"/>
+        <path d="M60 56 91 25A44 44 0 0 1 104 56Z M60 56 91 87A44 44 0 0 1 60 100Z M60 56 29 87A44 44 0 0 1 16 56Z M60 56 29 25A44 44 0 0 1 60 12Z" fill="#ffd36b"/>
+        <circle cx="60" cy="56" r="9" fill="#2a1c00"/></g>
+        <path d="M52 4h16L60 20Z" fill="#fff"/></svg></span>
+      <span class="meta"><span class="txt"><span class="tname">Roue</span><span class="tdesc">Fais tourner, trois niveaux de risque</span><span class="last" data-g="Roue"></span></span><span class="odds">jusqu'à 9.7x</span></span>
+    </button>
+    <button class="tile" style="--c:#5a6b1f;--i:7" onclick="navigateTo('hilo-page')">
+      <span class="art" aria-hidden="true"><svg viewBox="0 0 120 110">
+        <g class="cd-a"><rect x="14" y="14" width="50" height="72" rx="8" fill="#f4efe0"/><text x="39" y="58" text-anchor="middle" font-size="26" fill="#151c3d">7</text></g>
+        <g class="cd-b"><rect x="54" y="22" width="50" height="72" rx="8" fill="#f4efe0" stroke="rgba(0,0,0,.2)"/><text x="79" y="66" text-anchor="middle" font-size="26" fill="#c8323a">K</text></g>
+        <path d="M100 18l8 12H92zM100 100l8-12H92z" fill="#ffd36b"/></svg></span>
+      <span class="meta"><span class="txt"><span class="tname">Hi-Lo</span><span class="tdesc">Plus haut ou plus bas ?</span><span class="last" data-g="Hi-Lo"></span></span><span class="odds">série illimitée</span></span>
+    </button>
+    <button class="tile" style="--c:#c9531f;--i:8" onclick="navigateTo('slots-page')">
+      <span class="art" aria-hidden="true"><svg viewBox="0 0 120 110">
+        <g class="rl"><rect x="8" y="22" width="32" height="56" rx="8" fill="#f4efe0"/><text x="24" y="62" text-anchor="middle" font-size="26" fill="#c8323a">7</text></g>
+        <g class="rl" style="animation-delay:.08s"><rect x="44" y="22" width="32" height="56" rx="8" fill="#f4efe0"/><text x="60" y="62" text-anchor="middle" font-size="26" fill="#c8323a">7</text></g>
+        <g class="rl" style="animation-delay:.16s"><rect x="80" y="22" width="32" height="56" rx="8" fill="#f4efe0"/><text x="96" y="62" text-anchor="middle" font-size="26" fill="#c8323a">7</text></g>
+        <rect x="4" y="46" width="112" height="4" rx="2" fill="#ffd36b"/></svg></span>
+      <span class="meta"><span class="txt"><span class="tname">Machine à sous</span><span class="tdesc">Trois rouleaux, un jackpot</span><span class="last" data-g="Machine à sous"></span></span><span class="odds">jusqu'à 400x</span></span>
+    </button>
+    <button class="tile" style="--c:#4a5f86;--i:9" onclick="navigateTo('keno-page')">
+      <span class="art" aria-hidden="true"><svg viewBox="0 0 120 110">
+        <g fill="rgba(0,0,0,.25)"><circle cx="20" cy="22" r="11"/><circle cx="50" cy="22" r="11"/><circle cx="80" cy="22" r="11"/><circle cx="110" cy="22" r="11"/><circle cx="20" cy="52" r="11"/><circle cx="80" cy="52" r="11"/><circle cx="110" cy="52" r="11"/><circle cx="20" cy="82" r="11"/><circle cx="50" cy="82" r="11"/><circle cx="110" cy="82" r="11"/></g>
+        <circle class="kn-d" cx="50" cy="52" r="11" fill="#7ee0a6"/><circle class="kn-d" cx="80" cy="82" r="11" fill="#7ee0a6" style="animation-delay:.12s"/><circle class="kn-d" cx="50" cy="22" r="11" fill="none" stroke="#ffd36b" stroke-width="3" style="animation-delay:.24s"/></svg></span>
+      <span class="meta"><span class="txt"><span class="tname">Keno</span><span class="tdesc">Choisis tes numéros, le tirage décide</span><span class="last" data-g="Keno"></span></span><span class="odds">jusqu'à 90x</span></span>
+    </button>
+    <button class="tile" style="--c:#7c5a3a;--i:10" onclick="navigateTo('tower-page')">
+      <span class="art" aria-hidden="true"><svg viewBox="0 0 120 110">
+        <g fill="rgba(0,0,0,.25)"><rect x="14" y="8" width="28" height="16" rx="5"/><rect x="46" y="8" width="28" height="16" rx="5"/><rect x="78" y="8" width="28" height="16" rx="5"/>
+        <rect x="14" y="30" width="28" height="16" rx="5"/><rect x="78" y="30" width="28" height="16" rx="5"/>
+        <rect x="46" y="52" width="28" height="16" rx="5"/><rect x="78" y="52" width="28" height="16" rx="5"/></g>
+        <rect class="tw-b" x="46" y="30" width="28" height="16" rx="5" fill="#7ee0a6"/><rect class="tw-b" x="14" y="52" width="28" height="16" rx="5" fill="#7ee0a6" style="animation-delay:.1s"/>
+        <rect class="tw-b" x="14" y="74" width="28" height="16" rx="5" fill="#7ee0a6" style="animation-delay:.2s"/><rect class="tw-b" x="46" y="74" width="28" height="16" rx="5" fill="#ff6b6b" style="animation-delay:.3s"/><rect x="78" y="74" width="28" height="16" rx="5" fill="rgba(0,0,0,.25)"/></svg></span>
+      <span class="meta"><span class="txt"><span class="tname">Tour</span><span class="tdesc">Monte étage par étage sans tomber</span><span class="last" data-g="Tour"></span></span><span class="odds">jusqu'à 6 000x</span></span>
+    </button>
   </div>
   <div class="foot"><button class="linkbtn" onclick="navigateTo('admin-page')">Administration</button></div>
 </main>
@@ -347,7 +457,7 @@ select option{background:var(--void2)}
   </div>
   <aside class="rail">
     <h2>Canyon</h2>
-    <p class="rule">Esquive les rochers et ramasse les orbes dorés : chacun ajoute 0.10x. La cote monte avec le temps. Une collision fait perdre la mise.</p>
+    <p class="rule">Esquive les rochers, les comètes (une flèche rouge les annonce) et les murs à brèche. Chaque orbe doré ajoute 0.10x, la cote monte avec le temps, mais tout accélère. Une collision fait perdre la mise.</p>
     <label class="field">Mise
       <div class="bet"><input type="number" id="canyon-bet" value="10" min="1" step="1"><button class="qb" onclick="Bet.mul('canyon',.5)">½</button><button class="qb" onclick="Bet.mul('canyon',2)">×2</button></div>
     </label>
@@ -391,6 +501,121 @@ select option{background:var(--void2)}
       <input type="range" id="dice-slider" min="2" max="95" value="50" oninput="Dice.upd()">
     </label>
     <button class="btn play" onclick="Dice.play()">Lancer</button>
+  </aside>
+</section>
+
+<!-- Plinko -->
+<section id="plinko-page" class="page game">
+  <div class="stage">
+    <div class="readout"><div class="multiplier" id="plinko-mult">-</div><div class="sub" id="plinko-sub">Choisis ton risque, puis lâche la bille</div></div>
+    <canvas id="plinko-canvas" width="600" height="480"></canvas>
+  </div>
+  <aside class="rail">
+    <h2>Plinko</h2>
+    <p class="rule">La bille rebondit sur 8 rangées de clous. Les bords paient le plus, le centre le moins.</p>
+    <label class="field">Mise
+      <div class="bet"><input type="number" id="plinko-bet" value="10" min="1" step="1"><button class="qb" onclick="Bet.mul('plinko',.5)">½</button><button class="qb" onclick="Bet.mul('plinko',2)">×2</button></div>
+    </label>
+    <label class="field">Risque
+      <select id="plinko-risk" onchange="Plinko.setup()"><option value="0">Faible</option><option value="1" selected>Moyen</option><option value="2">Élevé</option></select>
+    </label>
+    <button class="btn play" onclick="Plinko.drop()">Lâcher la bille</button>
+  </aside>
+</section>
+
+<!-- Roue -->
+<section id="wheel-page" class="page game">
+  <div class="stage">
+    <div class="readout"><div class="multiplier" id="wheel-mult">-</div><div class="sub" id="wheel-sub">La pointe en haut désigne le gain</div></div>
+    <div class="wheel-wrap"><canvas id="wheel-canvas" width="440" height="440"></canvas></div>
+  </div>
+  <aside class="rail">
+    <h2>Roue</h2>
+    <p class="rule">Vingt cases, une seule pointe. Plus le risque est élevé, plus les cases vides sont nombreuses et les gains grands.</p>
+    <label class="field">Mise
+      <div class="bet"><input type="number" id="wheel-bet" value="10" min="1" step="1"><button class="qb" onclick="Bet.mul('wheel',.5)">½</button><button class="qb" onclick="Bet.mul('wheel',2)">×2</button></div>
+    </label>
+    <label class="field">Risque
+      <select id="wheel-risk" onchange="Wheel.draw()"><option value="0">Prudent</option><option value="1" selected>Équilibré</option><option value="2">Audacieux</option></select>
+    </label>
+    <button class="btn play" onclick="Wheel.spin()">Lancer la roue</button>
+  </aside>
+</section>
+
+<!-- Hi-Lo -->
+<section id="hilo-page" class="page game">
+  <div class="stage">
+    <div class="readout"><div class="multiplier" id="hilo-mult">1.00x</div><div class="sub" id="hilo-sub">La carte suivante est-elle plus haute ou plus basse ?</div></div>
+    <div class="pcards" id="hilo-cards"></div>
+  </div>
+  <aside class="rail">
+    <h2>Hi-Lo</h2>
+    <p class="rule">Devine si la prochaine carte est plus haute ou plus basse (l'as est la plus basse, le roi la plus haute). Une égalité fait perdre. Enchaîne les bonnes réponses, encaisse quand tu veux.</p>
+    <label class="field">Mise
+      <div class="bet"><input type="number" id="hilo-bet" value="10" min="1" step="1"><button class="qb" onclick="Bet.mul('hilo',.5)">½</button><button class="qb" onclick="Bet.mul('hilo',2)">×2</button></div>
+    </label>
+    <button id="hilo-start" class="btn play" onclick="HiLo.start()">Distribuer</button>
+    <div class="acts" id="hilo-acts">
+      <button class="btn play" id="hilo-hi" onclick="HiLo.guess(1)">Plus haut</button>
+      <button class="btn play" id="hilo-lo" onclick="HiLo.guess(-1)">Plus bas</button>
+      <button class="btn ghost full" onclick="HiLo.skip()">Changer de carte (gratuit)</button>
+    </div>
+    <button id="hilo-cash" class="btn cash" onclick="HiLo.cash()">Encaisser</button>
+  </aside>
+</section>
+
+<!-- Machine à sous -->
+<section id="slots-page" class="page game">
+  <div class="stage">
+    <div class="readout"><div class="multiplier" id="slots-mult">-</div><div class="sub" id="slots-sub">Trois symboles identiques, ou deux cerises</div></div>
+    <div class="reels"><div class="reel" id="reel0">7</div><div class="reel" id="reel1">7</div><div class="reel" id="reel2">7</div></div>
+    <div class="paytable" id="slots-pay"></div>
+  </div>
+  <aside class="rail">
+    <h2>Machine à sous</h2>
+    <p class="rule">Trois rouleaux. Trois symboles identiques paient la cote du tableau, et deux cerises remboursent déjà un peu plus que ta mise.</p>
+    <label class="field">Mise
+      <div class="bet"><input type="number" id="slots-bet" value="10" min="1" step="1"><button class="qb" onclick="Bet.mul('slots',.5)">½</button><button class="qb" onclick="Bet.mul('slots',2)">×2</button></div>
+    </label>
+    <button class="btn play" onclick="Slots.play()">Lancer</button>
+  </aside>
+</section>
+
+<!-- Keno -->
+<section id="keno-page" class="page game">
+  <div class="stage">
+    <div class="readout"><div class="multiplier" id="keno-mult">-</div><div class="sub" id="keno-sub">Choisis de 1 à 5 numéros</div></div>
+    <div class="keno-grid" id="keno-grid"></div>
+    <div class="kn-pay" id="keno-pay"></div>
+  </div>
+  <aside class="rail">
+    <h2>Keno</h2>
+    <p class="rule">Choisis de 1 à 5 numéros parmi 20. Le tirage en révèle 8. Plus tu en trouves, plus tu gagnes.</p>
+    <label class="field">Mise
+      <div class="bet"><input type="number" id="keno-bet" value="10" min="1" step="1"><button class="qb" onclick="Bet.mul('keno',.5)">½</button><button class="qb" onclick="Bet.mul('keno',2)">×2</button></div>
+    </label>
+    <button class="btn ghost" onclick="Keno.random()">Choisir 5 numéros au hasard</button>
+    <button class="btn play" onclick="Keno.play()">Lancer le tirage</button>
+  </aside>
+</section>
+
+<!-- Tour -->
+<section id="tower-page" class="page game">
+  <div class="stage">
+    <div class="readout"><div class="multiplier" id="tower-mult">1.00x</div><div class="sub" id="tower-sub">Huit étages à grimper</div></div>
+    <div class="tower" id="tower-board"></div>
+  </div>
+  <aside class="rail">
+    <h2>Tour</h2>
+    <p class="rule">À chaque étage, choisis une case. Un piège te fait tout perdre, une case sûre te fait monter. Encaisse quand tu veux.</p>
+    <label class="field">Mise
+      <div class="bet"><input type="number" id="tower-bet" value="10" min="1" step="1"><button class="qb" onclick="Bet.mul('tower',.5)">½</button><button class="qb" onclick="Bet.mul('tower',2)">×2</button></div>
+    </label>
+    <label class="field">Difficulté
+      <select id="tower-diff" onchange="Tower.build(false)"><option value="0">Facile : 4 cases, 1 piège</option><option value="1" selected>Normal : 3 cases, 1 piège</option><option value="2">Difficile : 2 cases, 1 piège</option><option value="3">Extrême : 3 cases, 2 pièges</option></select>
+    </label>
+    <button id="tower-start" class="btn play" onclick="Tower.start()">Commencer</button>
+    <button id="tower-cash" class="btn cash" onclick="Tower.cash()">Encaisser</button>
   </aside>
 </section>
 
@@ -563,7 +788,7 @@ const Stats={d:{n:0,w:0,best:0,net:0,h:[]},
    `<li class="item"><div class="info"><b>Aucune manche pour l'instant</b><span>Lance un jeu : tes résultats s'afficheront ici.</span></div></li>`;
  }
 };
-function settle(game,bet,pay){Stats.record(game,bet,pay);pay>0?Snd.win():Snd.lose()}
+function settle(game,bet,pay){Stats.record(game,bet,pay);pay>bet?Snd.win():Snd.lose()}
 function lockNav(on){document.querySelectorAll('.navlink[data-nav]').forEach(b=>b.disabled=on)}
 
 /* ---------- Bonus quotidien ---------- */
@@ -612,8 +837,7 @@ function setRunning(g,on){
  if(c)c.style.display=on?'block':'none';
  $(`#${g}-bet`).disabled=on;
  document.querySelectorAll(`#${g}-page .qb`).forEach(b=>b.disabled=on);
- if(g==='mines')$('#mines-count').disabled=on;
- if(g==='crash')$('#crash-auto').disabled=on;
+ document.querySelectorAll(`#${g}-page .rail input,#${g}-page .rail select`).forEach(e=>e.disabled=on);
  lockNav(on);Bank.render();
 }
 function navigateTo(id){
@@ -629,6 +853,12 @@ function navigateTo(id){
  if(id==='stats-page')Stats.render();
  if(id==='lobby'){Daily.render();Lobby.render()}
  if(id==='dice-page')Dice.upd();
+ if(id==='plinko-page')Plinko.setup();
+ if(id==='wheel-page')Wheel.draw();
+ if(id==='hilo-page')HiLo.reset();
+ if(id==='slots-page')Slots.render();
+ if(id==='keno-page')Keno.build();
+ if(id==='tower-page')Tower.build(false);
  if(id==='admin-page')Admin.show();
 }
 
@@ -744,18 +974,20 @@ function steer(e){
 }
 cv.addEventListener('pointerdown',steer);
 cv.addEventListener('pointermove',steer);
-const Canyon={raf:0,fx:0,last:0,score:1,x:300,tx:300,vx:0,obs:[],orbs:[],stars:[],parts:[],bet:0,got:0,best:0,shake:0,pal:{},
+const Canyon={raf:0,fx:0,last:0,score:1,x:300,tx:300,vx:0,obs:[],orbs:[],warns:[],wallT:0,stars:[],parts:[],bet:0,got:0,best:0,shake:0,pal:{},
  loadBest(){try{this.best=+localStorage.getItem('gc_canyon_best')||0}catch(e){}},
  info(){
   const rec=this.best>1?`Meilleure cote : ${this.best.toFixed(2)}x`:'';
-  $('#canyon-sub').textContent=(current==='canyon'?[`Orbes dorés : ${this.got}`,rec]:['Flèches ← →, touches Q et D, ou glisse le doigt',rec]).filter(Boolean).join(' · ');
+  $('#canyon-sub').textContent=(current==='canyon'?[`Niveau ${this.lvl()}`,`Orbes dorés : ${this.got}`,rec]:['Flèches ← →, touches Q et D, ou glisse le doigt',rec]).filter(Boolean).join(' · ');
  },
+ lvl(){return 1+Math.floor((this.score-1)/0.4)},
+ speed(){return Math.min(800,360+105*(this.score-1))},
  palette(){this.pal={bg1:col('--void'),bg2:col('--void2'),ship:(SHIPS[Shop.ship]||SHIPS.base).c||col('--brass')}},
  seed(){this.stars=Array.from({length:70},()=>({x:Math.random()*CW,y:Math.random()*CH,z:.2+Math.random()*.8}))},
  rock(y){
-  const r=16+Math.random()*18,n=7+Math.floor(Math.random()*3);
+  const big=Math.random()<.18,r=(big?30:15)+Math.random()*(big?14:18),n=7+Math.floor(Math.random()*3);
   const pts=Array.from({length:n},(_,i)=>{const a=i/n*Math.PI*2,k=.78+Math.random()*.32;return[Math.cos(a)*r*k,Math.sin(a)*r*k]});
-  return{x:r+Math.random()*(CW-2*r),y,r,pts,rot:Math.random()*6.28,vr:(Math.random()-.5)*1.6,dx:(Math.random()-.5)*40};
+  return{x:r+Math.random()*(CW-2*r),y,r,pts,rot:Math.random()*6.28,vr:(Math.random()-.5)*1.6,dx:(Math.random()-.5)*(40+Math.min(90,(this.score-1)*40)),sf:.85+Math.random()*.45};
  },
  burst(x,y,c,n,sp,life){
   for(let i=0;i<n;i++){const a=Math.random()*6.28,v=sp*(.3+Math.random()*.7);
@@ -778,8 +1010,20 @@ const Canyon={raf:0,fx:0,last:0,score:1,x:300,tx:300,vx:0,obs:[],orbs:[],stars:[
    ctx.beginPath();ctx.arc(o.x,o.y,8+Math.sin(o.t*6)*1.5,0,7);ctx.fill();
    ctx.shadowBlur=0;ctx.fillStyle='#fff6d6';ctx.beginPath();ctx.arc(o.x-2,o.y-2,2.5,0,7);ctx.fill();
   });
-  ctx.lineWidth=2;ctx.lineJoin='round';ctx.fillStyle='#6f78a3';ctx.strokeStyle='#aab2d8';
+  this.warns.forEach(w=>{
+   ctx.globalAlpha=.5+.5*Math.sin(w.t*28);ctx.fillStyle='#ff5a4f';
+   ctx.beginPath();ctx.moveTo(w.x,26);ctx.lineTo(w.x-11,6);ctx.lineTo(w.x+11,6);ctx.closePath();ctx.fill();
+   ctx.globalAlpha=.12;ctx.fillRect(w.x-3,26,6,CH);ctx.globalAlpha=1;
+  });
+  ctx.lineWidth=2;ctx.lineJoin='round';
   this.obs.forEach(o=>{
+   if(o.comet){
+    ctx.save();ctx.shadowColor='#ff5a4f';ctx.shadowBlur=18;
+    const g2=ctx.createLinearGradient(0,o.y-90,0,o.y);g2.addColorStop(0,'rgba(255,90,79,0)');g2.addColorStop(1,'rgba(255,120,90,.85)');
+    ctx.fillStyle=g2;ctx.fillRect(o.x-4,o.y-90,8,90);
+    ctx.fillStyle='#fff1e8';ctx.beginPath();ctx.arc(o.x,o.y,o.r,0,7);ctx.fill();ctx.restore();return;
+   }
+   ctx.fillStyle='#6f78a3';ctx.strokeStyle='#aab2d8';
    ctx.save();ctx.translate(o.x,o.y);ctx.rotate(o.rot);ctx.beginPath();
    o.pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));
    ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
@@ -795,19 +1039,19 @@ const Canyon={raf:0,fx:0,last:0,score:1,x:300,tx:300,vx:0,obs:[],orbs:[],stars:[
  },
  idle(){
   cancelAnimationFrame(this.fx);this.fx=0;
-  this.palette();this.seed();this.obs=[];this.orbs=[];this.parts=[];this.shake=0;
+  this.palette();this.seed();this.obs=[];this.orbs=[];this.warns=[];this.parts=[];this.shake=0;
   this.x=this.tx=CW/2;this.vx=0;this.draw();this.info();$('#canyon-mult').textContent='1.00x';
  },
  start(){
   if(current)return;const b=getBet('canyon');if(!b||!Bank.take(b))return;
   cancelAnimationFrame(this.raf);cancelAnimationFrame(this.fx);this.fx=0;
   this.bet=b;this.score=1;this.got=0;this.vx=0;this.x=this.tx=CW/2;this.parts=[];this.shake=0;
-  this.palette();this.seed();
+  this.palette();this.seed();this.warns=[];this.wallT=0;
   this.orbs=[{x:60+Math.random()*(CW-120),y:150,t:0}];
   // Le champ est déjà semé : le danger est réel dès la première seconde.
   this.obs=[];
-  for(let i=0;i<7;i++){
-   const o=this.rock(70+i*50+Math.random()*20);
+  for(let i=0;i<9;i++){
+   const o=this.rock(60+i*42+Math.random()*16);
    if(o.y>260&&Math.abs(o.x-CW/2)<90)o.x=CW/2+(Math.random()<.5?-1:1)*(100+Math.random()*150);
    this.obs.push(o);
   }
@@ -816,7 +1060,7 @@ const Canyon={raf:0,fx:0,last:0,score:1,x:300,tx:300,vx:0,obs:[],orbs:[],stars:[
  },
  tick(now){
   const dt=Math.min((now-this.last)/1000,.05);this.last=now;
-  const v=Math.min(560,320+40*(this.score-1));
+  const v=this.speed();
   this.score+=0.3*dt;
   if(keys.ArrowLeft||keys.KeyA)this.tx-=SHIP_V*dt;
   if(keys.ArrowRight||keys.KeyD)this.tx+=SHIP_V*dt;
@@ -824,14 +1068,28 @@ const Canyon={raf:0,fx:0,last:0,score:1,x:300,tx:300,vx:0,obs:[],orbs:[],stars:[
   const nx=this.x+clamp(this.tx-this.x,-SHIP_V*dt,SHIP_V*dt);
   this.vx=dt?(nx-this.x)/dt:0;this.x=nx;
   this.stars.forEach(s=>{s.y+=v*s.z*.45*dt;if(s.y>CH){s.y=0;s.x=Math.random()*CW}});
-  if(Math.random()<Math.min(7,4+0.9*(this.score-1))*dt)this.obs.push(this.rock(-40));
-  if(Math.random()<.45*dt)this.orbs.push({x:30+Math.random()*(CW-60),y:-20,t:0});
+  if(Math.random()<Math.min(13,5.5+2.2*(this.score-1))*dt)this.obs.push(this.rock(-40));
+  if(Math.random()<.4*dt)this.orbs.push({x:30+Math.random()*(CW-60),y:-20,t:0});
+  // Comètes : un avertissement rouge, puis un projectile rapide qui vise ta position
+  if(this.score>=1.25&&Math.random()<Math.min(1.5,.4+.7*(this.score-1.25))*dt)this.warns.push({x:clamp(this.x+this.vx*.25,20,CW-20),t:0});
+  for(const w of this.warns){w.t+=dt;if(w.t>=.75){w.done=true;this.obs.push({comet:true,x:w.x,y:-20,r:9,dx:0,vr:0,rot:0,sf:1.75})}}
+  this.warns=this.warns.filter(w=>!w.done);
+  // Murs : une rangée de rochers avec une seule brèche, toujours atteignable
+  if(this.score>=1.6){
+   this.wallT-=dt;
+   if(this.wallT<=0){
+    this.wallT=Math.max(3,5.6-.9*(this.score-1.6));
+    const gw=Math.max(110,170-20*(this.score-1.6)),reach=(SHIP_Y+40)/v*SHIP_V*.7;
+    const gx=clamp(this.x+(Math.random()*2-1)*Math.min(reach,260),gw/2+10,CW-gw/2-10);
+    for(let x=24;x<CW;x+=48)if(Math.abs(x-gx)>gw/2){const o=this.rock(-50);o.x=x;o.r=22;o.dx=0;o.vr*=.4;o.sf=1;this.obs.push(o)}
+   }
+  }
   let hit=false;
   for(const o of this.obs){
-   o.y+=v*dt;o.x+=o.dx*dt;if(o.x<o.r||o.x>CW-o.r)o.dx*=-1;o.rot+=o.vr*dt;
-   if(Math.hypot(o.x-this.x,o.y-SHIP_Y)<o.r*.85+13)hit=true;
+   o.y+=v*o.sf*dt;o.x+=o.dx*dt;if(o.x<o.r||o.x>CW-o.r)o.dx*=-1;o.rot+=o.vr*dt;
+   if(Math.hypot(o.x-this.x,o.y-SHIP_Y)<o.r*(o.comet?1:.85)+13)hit=true;
   }
-  this.obs=this.obs.filter(o=>o.y<CH+50);
+  this.obs=this.obs.filter(o=>o.y<CH+110);
   for(const o of this.orbs){
    o.y+=v*.9*dt;o.t+=dt;
    if(!o.taken&&Math.hypot(o.x-this.x,o.y-SHIP_Y)<30){
@@ -900,6 +1158,270 @@ const Dice={
  }
 };
 
+/* ---------- Outils communs aux nouveaux jeux ---------- */
+const fm=m=>String(+m.toFixed(2));
+function busy(g,on){
+ current=on?g:null;lockNav(on);
+ document.querySelectorAll(`#${g}-page .rail .btn,#${g}-page .rail input,#${g}-page .rail select,#${g}-page .rail .qb`).forEach(e=>e.disabled=on);
+ Bank.render();
+}
+function finish(game,bet,mult,label){
+ const p=mult>0?Bank.pay(bet*mult):0;settle(game,bet,p);
+ const net=Math.round((p-bet)*100)/100;
+ toast(`${label} : ${net>=0?'+':''}${net.toFixed(2)}${CR}`,net>0?'win':'lose');
+ return p;
+}
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* ---------- PLINKO : le chemin est tiré à pile ou face, la bille l'illustre ---------- */
+const PL={probs:[1,8,28,56,70,56,28,8,1].map(x=>x/256),
+ raw:[[5.6,2.1,1.1,1,.5,1,1.1,2.1,5.6],[13,3,1.3,.7,.4,.7,1.3,3,13],[29,4,1.5,.3,.2,.3,1.5,4,29]],
+ tab(r){const a=this.raw[r],f=HOUSE/a.reduce((s,m,i)=>s+m*this.probs[i],0);return a.map(m=>Math.round(m*f*100)/100)}};
+const plCv=$('#plinko-canvas'),pc=plCv.getContext('2d');
+const Plinko={dx:46,dy:44,cx:300,top:58,mults:[],lit:{},slot:-1,ball:null,raf:0,
+ setup(){this.mults=PL.tab(+$('#plinko-risk').value);this.slot=-1;this.ball=null;this.lit={};this.draw();$('#plinko-mult').textContent='-';$('#plinko-sub').textContent='Choisis ton risque, puis lâche la bille'},
+ draw(){
+  const c=pc,now=performance.now();c.clearRect(0,0,600,480);
+  for(let i=0;i<8;i++)for(let k=0;k<i+3;k++){
+   const x=this.cx+(k-(i+2)/2)*this.dx,y=this.top+i*this.dy,on=(this.lit[i+','+k]||0)>now;
+   c.fillStyle=on?col('--brass'):'rgba(244,239,224,.8)';c.beginPath();c.arc(x,y,on?6.5:4.5,0,7);c.fill();
+  }
+  c.textAlign='center';c.font='bold 12px Instrument Sans,Arial';
+  this.mults.forEach((m,s)=>{
+   const x=this.cx+(s-4)*this.dx,w=this.dx-6,y=410;
+   c.fillStyle=s===this.slot?col('--win'):m>=10?col('--brass'):m>=2?'rgba(242,184,75,.55)':m>=1?'rgba(244,239,224,.22)':'rgba(255,107,107,.38)';
+   c.beginPath();c.roundRect(x-w/2,y,w,40,9);c.fill();
+   c.fillStyle=s===this.slot||m>=10?'#2a1c00':col('--ivory');c.fillText((m>=10?m.toFixed(1):fm(m))+'x',x,y+25);
+  });
+  if(this.ball){c.shadowColor='#fff';c.shadowBlur=12;c.fillStyle='#f4efe0';c.beginPath();c.arc(this.ball.x,this.ball.y,9,0,7);c.fill();c.shadowBlur=0}
+ },
+ drop(){
+  if(current)return;const b=getBet('plinko');if(!b||!Bank.take(b))return;
+  busy('plinko',true);toast('');this.slot=-1;this.lit={};
+  const way=[{x:this.cx,y:12}];let r=0;
+  for(let i=0;i<8;i++){const d=Math.random()<.5?1:0,k=r+1;r+=d;way.push({x:this.cx+(2*r-(i+1))*this.dx/2,y:this.top+i*this.dy,i,k})}
+  way.push({x:way[8].x,y:430});
+  const D=135,T=D*9,t0=performance.now();let seen=0;
+  const step=now=>{
+   const t=Math.min(now-t0,T),sg=Math.min(8,Math.floor(t/D)),u=(t-sg*D)/D,a=way[sg],z=way[sg+1];
+   const e=u*u*(3-2*u);
+   this.ball={x:a.x+(z.x-a.x)*e,y:a.y+(z.y-a.y)*(u*.6+u*u*.4)-Math.sin(u*Math.PI)*9};
+   while(seen<sg){seen++;const w=way[seen];if(w.i!==undefined){this.lit[w.i+','+w.k]=performance.now()+260;Snd.tick(w.i)}}
+   this.draw();
+   if(t<T)this.raf=requestAnimationFrame(step);
+   else{
+    this.raf=0;this.ball=null;this.slot=r;this.draw();
+    const m=this.mults[r];$('#plinko-mult').textContent=fm(m)+'x';$('#plinko-sub').textContent='';
+    finish('Plinko',b,m,`Case ${fm(m)}x`);busy('plinko',false);
+   }
+  };
+  this.raf=requestAnimationFrame(step);
+ }
+};
+
+/* ---------- ROUE : 20 cases, retour théorique de 97 % ---------- */
+const WH=[{0:6,1:5,1.5:6,2:3},{0:10,1.5:6,2:2,3:1,4:1},{0:16,2:1,3:1,5:1,10:1}];
+function wheelSegs(r){
+ const nz=[],zs=[];
+ Object.entries(WH[r]).forEach(([v,n])=>{for(let i=0;i<n;i++)(+v?nz:zs).push(+v)});
+ nz.sort((a,b)=>b-a);const mix=[];
+ while(nz.length){mix.push(nz.shift());if(nz.length)mix.push(nz.pop())}
+ const seg=Array(20).fill(0);mix.forEach((v,j)=>{seg[Math.floor((j+.5)*20/mix.length)]=v});
+ return seg;
+}
+const WCOL={0:'#232b5a',1:'#2b4fd1',1.5:'#127a63',2:'#b8791a',3:'#6b3fd4',4:'#c8323a',5:'#b8338a',10:'#ffd36b'};
+const wCv=$('#wheel-canvas'),wc=wCv.getContext('2d');
+const Wheel={rot:0,segs:[],
+ draw(){
+  this.segs=wheelSegs(+$('#wheel-risk').value);const c=wc,R=216,A=Math.PI*2/20;
+  c.clearRect(0,0,440,440);c.save();c.translate(220,220);
+  this.segs.forEach((v,i)=>{
+   const a0=-Math.PI/2+i*A;c.fillStyle=WCOL[v];c.beginPath();c.moveTo(0,0);c.arc(0,0,R,a0,a0+A);c.closePath();c.fill();
+   c.strokeStyle='rgba(244,239,224,.35)';c.lineWidth=2;c.stroke();
+   c.save();c.rotate(a0+A/2);c.fillStyle=v===10?'#2a1c00':'#f4efe0';c.font='bold 17px Instrument Sans,Arial';c.textAlign='right';c.textBaseline='middle';
+   c.fillText(v?fm(v*HOUSE):'0',R-14,0);c.restore();
+  });
+  c.fillStyle='#151c3d';c.beginPath();c.arc(0,0,26,0,7);c.fill();c.strokeStyle='#f2b84b';c.lineWidth=4;c.stroke();
+  c.restore();
+ },
+ spin(){
+  if(current)return;const b=getBet('wheel');if(!b||!Bank.take(b))return;
+  busy('wheel',true);toast('');$('#wheel-mult').textContent='...';$('#wheel-sub').textContent='';
+  const i=Math.floor(Math.random()*20),target=((-(i+.5)*18+(Math.random()-.5)*10)%360+360)%360;
+  this.rot=(Math.floor(this.rot/360)+6)*360+target;
+  wCv.style.transform=`rotate(${this.rot}deg)`;
+  const v=this.segs[i];
+  for(let k=0;k<12;k++)Snd.tone(300+k*40,.05,'square',.03,k*.28);
+  setTimeout(()=>{
+   const m=v*HOUSE;$('#wheel-mult').textContent=v?fm(m)+'x':'0x';
+   finish('Roue',b,m,v?`Case ${fm(m)}x`:'Case vide');busy('wheel',false);
+  },4150);
+ }
+};
+
+/* ---------- HI-LO : tirage avec remise, cote = 97 % / probabilité ---------- */
+const SUITS=['♠','♥','♦','♣'],RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const cardEl=(c,cls='')=>`<div class="pcard ${cls} ${c.s===1||c.s===2?'red':''}"><b>${RANKS[c.r-1]}</b><i>${SUITS[c.s]}</i></div>`;
+const HiLo={cur:null,hist:[],mult:1,wins:0,bet:0,on:false,
+ pick(){return{r:1+Math.floor(Math.random()*13),s:Math.floor(Math.random()*4)}},
+ p(d){const r=this.cur.r;return d>0?(13-r)/13:(r-1)/13},
+ step(d){const p=this.p(d);return p>0?HOUSE/p:0},
+ reset(){this.on=false;this.cur=null;this.hist=[];this.mult=1;this.wins=0;this.render()},
+ render(fresh){
+  $('#hilo-cards').innerHTML=this.cur?this.hist.slice(-5).map(c=>cardEl(c,'sm')).join('')+cardEl(this.cur,fresh?'fresh':''):'<div class="pcard back"><b>?</b></div>';
+  $('#hilo-mult').textContent=this.mult.toFixed(2)+'x';
+  $('#hilo-acts').classList.toggle('on',this.on);
+  if(this.on){
+   const hi=this.step(1),lo=this.step(-1);
+   $('#hilo-hi').disabled=!hi;$('#hilo-lo').disabled=!lo;
+   $('#hilo-hi').textContent=hi?`Plus haut x${hi.toFixed(2)}`:'Plus haut';
+   $('#hilo-lo').textContent=lo?`Plus bas x${lo.toFixed(2)}`:'Plus bas';
+   const cb=$('#hilo-cash');cb.disabled=this.wins===0;cb.innerHTML=this.wins?`Encaisser ${(this.bet*this.mult).toFixed(2)}${CR}`:'Encaisser';
+  }
+ },
+ start(){
+  if(current)return;const b=getBet('hilo');if(!b||!Bank.take(b))return;
+  this.bet=b;this.mult=1;this.wins=0;this.hist=[];this.cur=this.pick();this.on=true;
+  toast('');$('#hilo-sub').textContent='Plus haut ou plus bas ?';setRunning('hilo',true);this.render(true);
+ },
+ guess(d){
+  if(!this.on)return;const st=this.step(d);if(!st)return;
+  const old=this.cur,nx=this.pick();this.hist.push(old);this.cur=nx;
+  const win=d>0?nx.r>old.r:nx.r<old.r;
+  if(win){
+   this.mult*=st;this.wins++;Snd.tick(this.wins);this.render(true);
+   if(this.mult>=500)this.cash();
+  }else{
+   this.on=false;this.render(true);setRunning('hilo',false);
+   settle('Hi-Lo',this.bet,0);
+   $('#hilo-sub').textContent=nx.r===old.r?'Égalité : perdu':'Raté';
+   toast(`${RANKS[nx.r-1]} : -${this.bet.toFixed(2)}${CR}`,'lose');
+  }
+ },
+ skip(){if(!this.on)return;this.hist.push(this.cur);this.cur=this.pick();this.render(true)},
+ cash(){
+  if(!this.on||this.wins<1)return;this.on=false;
+  const p=Bank.pay(this.bet*this.mult);this.render();setRunning('hilo',false);settle('Hi-Lo',this.bet,p);
+  $('#hilo-sub').textContent=`Encaissé à ${this.mult.toFixed(2)}x`;
+  toast(`Encaissé : +${(p-this.bet).toFixed(2)}${CR}`,'win');
+ }
+};
+
+/* ---------- MACHINE À SOUS : tirage pondéré, retour théorique ≈ 97 % ---------- */
+const SL={w:{c:8,l:6,b:4,s:3,d:2,7:1},pay:{c:6,l:10,b:24,s:50,d:110,7:400},two:1.3,
+ face:{c:'🍒',l:'🍋',b:'🔔',s:'⭐',d:'💎',7:'<span class="s7">7</span>'},
+ pick(){const T=Object.values(this.w).reduce((a,b)=>a+b,0);let r=Math.random()*T;for(const k in this.w){r-=this.w[k];if(r<0)return k}return'c'},
+ mult(a){if(a[0]===a[1]&&a[1]===a[2])return this.pay[a[0]];return a.filter(x=>x==='c').length===2?this.two:0}};
+const Slots={
+ render(){$('#slots-pay').innerHTML=Object.keys(SL.pay).reverse().map(k=>`<div><span>${SL.face[k].repeat(3)}</span><b>x${SL.pay[k]}</b></div>`).join('')+`<div><span>🍒🍒 + autre</span><b>x${SL.two}</b></div>`},
+ play(){
+  if(current)return;const b=getBet('slots');if(!b||!Bank.take(b))return;
+  busy('slots',true);toast('');$('#slots-mult').textContent='...';
+  const reels=[0,1,2].map(i=>$('#reel'+i)),res=[SL.pick(),SL.pick(),SL.pick()],spinning=[true,true,true];
+  reels.forEach(r=>{r.classList.remove('win');r.classList.add('spin')});
+  const iv=setInterval(()=>reels.forEach((r,i)=>{if(spinning[i])r.innerHTML=SL.face[SL.pick()]}),70);
+  [700,1150,1600].forEach((t,i)=>setTimeout(()=>{
+   spinning[i]=false;reels[i].classList.remove('spin');reels[i].innerHTML=SL.face[res[i]];Snd.tick(i*3);
+   if(i===2){
+    clearInterval(iv);const m=SL.mult(res);
+    $('#slots-mult').textContent=m?'x'+m:'0x';
+    if(m)reels.forEach((r,j)=>{if(res[0]===res[1]&&res[1]===res[2]||res[j]==='c')r.classList.add('win')});
+    finish('Machine à sous',b,m,m?`x${m}`:'Perdu');busy('slots',false);
+   }
+  },t));
+ }
+};
+
+/* ---------- KENO : 8 numéros tirés sur 20, tableau calculé à partir des probabilités exactes ---------- */
+const Cb=(n,k)=>{if(k<0||k>n)return 0;let r=1;for(let i=1;i<=k;i++)r=r*(n-k+i)/i;return r};
+const Keno={picks:new Set(),
+ tab(n){
+  const kmin=Math.max(1,Math.ceil((n+1)/2)),ks=[],out={};
+  for(let k=kmin;k<=n;k++)ks.push(k);
+  ks.forEach(k=>{out[k]=Math.round(HOUSE/ks.length/(Cb(8,k)*Cb(12,n-k)/Cb(20,n))*100)/100});
+  return out;
+ },
+ build(){
+  this.picks=new Set();
+  $('#keno-grid').innerHTML=Array.from({length:20},(_,i)=>`<button class="kn" aria-label="Numéro ${i+1}" onclick="Keno.toggle(${i})">${i+1}</button>`).join('');
+  $('#keno-mult').textContent='-';this.upd();
+ },
+ cells(){return document.querySelectorAll('.kn')},
+ upd(){
+  const n=this.picks.size;this.cells().forEach((c,i)=>c.classList.toggle('pick',this.picks.has(i)));
+  $('#keno-sub').textContent=n?`${n} numéro${n>1?'s':''} choisi${n>1?'s':''} sur 5`:'Choisis de 1 à 5 numéros';
+  $('#keno-pay').innerHTML=n?Object.entries(this.tab(n)).map(([k,m])=>`${k} bon${k>1?'s':''} : <b>x${fm(m)}</b>`).join(' · '):'Les gains s\'affichent ici dès ton premier numéro.';
+ },
+ toggle(i){
+  if(current)return;
+  if(this.picks.has(i))this.picks.delete(i);else if(this.picks.size<5)this.picks.add(i);else return toast('5 numéros au maximum','lose');
+  toast('');this.upd();
+ },
+ random(){if(current)return;this.picks=new Set(shuffle(Array.from({length:20},(_,i)=>i)).slice(0,5));toast('');this.upd()},
+ play(){
+  if(current)return;if(!this.picks.size)return toast('Choisis au moins un numéro','lose');
+  const b=getBet('keno');if(!b||!Bank.take(b))return;
+  busy('keno',true);toast('');this.cells().forEach(c=>{c.disabled=true;c.classList.remove('drawn','hit')});
+  const draw=shuffle(Array.from({length:20},(_,i)=>i)).slice(0,8),n=this.picks.size;let hits=0;
+  draw.forEach((d,j)=>setTimeout(()=>{
+   const c=this.cells()[d],h=this.picks.has(d);c.classList.add('drawn');if(h){c.classList.add('hit');hits++;Snd.tick(hits+4)}else Snd.tick(0);
+   $('#keno-mult').textContent=`${hits} bon${hits>1?'s':''}`;
+   if(j===7){
+    const m=this.tab(n)[hits]||0;$('#keno-mult').textContent=m?`${hits} bon${hits>1?'s':''} : x${fm(m)}`:`${hits} bon${hits>1?'s':''}`;
+    finish('Keno',b,m,m?`x${fm(m)}`:`${hits} bon${hits>1?'s':''}`);busy('keno',false);this.cells().forEach(x=>x.disabled=false);
+   }
+  },j*170+200));
+ }
+};
+
+/* ---------- TOUR : 8 étages, un piège (ou deux) par étage ---------- */
+const TW=[{n:4,t:1},{n:3,t:1},{n:2,t:1},{n:3,t:2}],FLOORS=8;
+const Tower={floor:0,traps:[],bet:0,on:false,
+ d(){return TW[+$('#tower-diff').value]},
+ multAt(k){const d=this.d();return HOUSE*Math.pow(d.n/(d.n-d.t),k)},
+ build(active){
+  const d=this.d();if(!active){this.floor=0;this.on=false}
+  let h='';
+  for(let f=FLOORS-1;f>=0;f--)h+=`<div class="tw-row" data-f="${f}"><span class="tw-m">x${fm(this.multAt(f+1))}</span><div class="tw-tiles">`+Array.from({length:d.n},(_,j)=>`<button class="tw-t" aria-label="Étage ${f+1}, case ${j+1}" ${active?'':'disabled'} onclick="Tower.pick(${f},${j})"></button>`).join('')+'</div></div>';
+  $('#tower-board').innerHTML=h;this.mark();$('#tower-mult').textContent='1.00x';
+ },
+ rows(){return[...document.querySelectorAll('.tw-row')]},
+ mark(){
+  this.rows().forEach(r=>{const f=+r.dataset.f;r.classList.toggle('cur',this.on&&f===this.floor);r.querySelectorAll('.tw-t').forEach(b=>{if(!b.classList.contains('safe')&&!b.classList.contains('trap'))b.disabled=!(this.on&&f===this.floor)})});
+  const cb=$('#tower-cash');cb.disabled=this.floor===0;cb.innerHTML=this.floor?`Encaisser ${(this.bet*this.multAt(this.floor)).toFixed(2)}${CR}`:'Encaisser';
+ },
+ start(){
+  if(current)return;const b=getBet('tower');if(!b||!Bank.take(b))return;
+  const d=this.d();this.bet=b;this.floor=0;
+  this.traps=Array.from({length:FLOORS},()=>new Set(shuffle(Array.from({length:d.n},(_,i)=>i)).slice(0,d.t)));
+  toast('');setRunning('tower',true);this.on=true;this.build(true);
+  $('#tower-sub').textContent='Choisis une case au premier étage';
+ },
+ pick(f,j){
+  if(!this.on||f!==this.floor)return;
+  const row=this.rows().find(r=>+r.dataset.f===f),btns=row.querySelectorAll('.tw-t');
+  if(this.traps[f].has(j)){
+   this.on=false;btns.forEach((b,k)=>{b.disabled=true;if(this.traps[f].has(k)){b.textContent='💀';b.classList.add(k===j?'trap':'ghost')}});
+   btns[j].classList.remove('ghost');btns[j].classList.add('trap');
+   this.mark();setRunning('tower',false);settle('Tour',this.bet,0);
+   $('#tower-sub').textContent=`Piège à l'étage ${f+1}`;toast(`Piège ! -${this.bet.toFixed(2)}${CR}`,'lose');
+  }else{
+   btns[j].textContent='💎';btns[j].classList.add('safe');this.floor++;Snd.tick(this.floor);
+   $('#tower-mult').textContent=this.multAt(this.floor).toFixed(2)+'x';
+   $('#tower-sub').textContent=this.floor<FLOORS?`Étage ${this.floor+1} sur ${FLOORS}`:'Sommet atteint';
+   this.mark();
+   if(this.floor===FLOORS)this.cash();
+  }
+ },
+ cash(){
+  if(!this.on||this.floor<1)return;this.on=false;
+  const m=this.multAt(this.floor),p=Bank.pay(this.bet*m);
+  this.mark();this.rows().forEach(r=>r.querySelectorAll('.tw-t').forEach(b=>b.disabled=true));
+  setRunning('tower',false);settle('Tour',this.bet,p);$('#tower-sub').textContent=`Encaissé à ${m.toFixed(2)}x`;
+  toast(`Encaissé : +${(p-this.bet).toFixed(2)}${CR}`,'win');
+ }
+};
+
 /* ---------- ADMIN (code vérifié via hash SHA-256, session en mémoire) ---------- */
 const Admin={ok:false,fails:0,until:0,
  HASH:'038c5f2a0042acfe23afc6c498b428c115ee620bb5a16daf22946aef79d3b0f7',
@@ -920,7 +1442,7 @@ const Admin={ok:false,fails:0,until:0,
  resetStats(){if(!this.ok)return;Stats.reset();toast('Statistiques effacées','win')}
 };
 
-Shop.load();Bank.load();Snd.load();Stats.load();Canyon.loadBest();Lobby.render();Daily.render();setInterval(()=>Daily.render(),30000);Crash.reset();Mines.build(false);Dice.upd();
+Shop.load();Bank.load();Snd.load();Stats.load();Canyon.loadBest();Lobby.render();Daily.render();setInterval(()=>Daily.render(),30000);Crash.reset();Mines.build(false);Dice.upd();Plinko.setup();Wheel.draw();HiLo.reset();Slots.render();Keno.build();Tower.build(false);
 setTimeout(()=>document.body.classList.remove('intro'),1600);
 </script>
 </body>

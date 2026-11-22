@@ -5,9 +5,17 @@ Petit casino en un seul fichier HTML, jouable dans le navigateur, avec des **cr�
 ## Jeux
 - 🚀 **Crash** : encaisse avant le crash, la courbe et le multiplicateur sont synchronisés
 - 💣 **Mines** : grille de 16 cases, de 1 à 10 mines
-- 🛸 **Canyon** : pilote entre les rochers (flèches, Q et D, ou au doigt) et ramasse les orbes dorés
+- 🛸 **Canyon** : rochers, comètes annoncées par une flèche rouge et murs à brèche ; tout accélère avec la cote
 - 🪙 **Pile ou face** : cote x1.94
 - 🎲 **Dés** : choisis ton seuil et ta cote
+- 🔵 **Plinko** : une bille, 8 rangées de clous, trois niveaux de risque
+- 🎡 **Roue** : 20 cases, trois niveaux de risque
+- 🃏 **Hi-Lo** : plus haut ou plus bas, enchaîne et encaisse
+- 🎰 **Machine à sous** : trois rouleaux, jusqu'à x400
+- 🔢 **Keno** : 1 à 5 numéros, 8 tirés sur 20
+- 🗼 **Tour** : huit étages, quatre niveaux de difficulté
+
+Chaque nouveau jeu a un retour théorique d'environ 97 %, calculé à partir des vraies probabilités.
 
 ## Boutique
 Thèmes, badges, vaisseaux pour Canyon et Boost VIP (+5 % de gains), achetables avec tes gains.
